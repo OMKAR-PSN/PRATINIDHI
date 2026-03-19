@@ -1,80 +1,98 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Globe, Search, Bell, User } from 'lucide-react'
-import { useState } from 'react'
+import { Menu, X, Globe, ChevronDown, Shield } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar({ transparent = false, showSearch = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const isLanding = location.pathname === '/'
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const navBg = transparent
+    ? scrolled
+      ? 'bg-white/90 backdrop-blur-xl shadow-sm shadow-black/5'
+      : 'bg-transparent'
+    : 'bg-white/90 backdrop-blur-xl shadow-sm shadow-black/5'
+
+  const textClass = transparent && !scrolled ? 'text-white' : 'text-gray-700'
+  const logoText = transparent && !scrolled ? 'text-white' : 'text-gray-900'
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      transparent ? 'bg-transparent' : 'glass shadow-sm shadow-black/5'
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}>
+      {/* Tricolor bar at very top */}
+      {isLanding && !scrolled && (
+        <div className="h-[2px] bg-gradient-to-r from-saffron-500 via-white to-indian-green opacity-80" />
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 hover-scale transition-all">
-              <Globe className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="flex items-center justify-center relative w-10 h-10 min-w-[40px] group-hover:scale-105 transition-transform duration-300">
+              <div className="absolute inset-0 rounded-full border-[3px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-md"></div>
+              <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
             </div>
-            <span className={`font-heading font-bold text-xl ${
-              transparent ? 'text-white' : 'text-gray-900'
-            }`}>
-              Prati<span className="text-transparent bg-clip-text bg-gradient-to-r from-saffron-500 to-saffron-400">nidhi</span>
-              <span className={`text-xs font-normal ml-1 ${transparent ? 'text-white/40' : 'text-gray-300'}`}>AI</span>
-            </span>
+            <div className="flex flex-col">
+              <span className={`font-heading font-extrabold text-xl tracking-tight leading-none ${logoText} transition-colors duration-300`}>
+                PRATI<span className="text-saffron-500">NIDHI</span><span className={`text-[10px] uppercase ml-1 align-top tracking-widest font-semibold ${transparent && !scrolled ? 'text-white' : 'text-primary-600'}`}>AI</span>
+              </span>
+              <span className={`text-[9px] font-semibold tracking-[0.25em] uppercase ${transparent && !scrolled ? 'text-white/60' : 'text-gray-500'} transition-colors duration-300 mt-0.5`}>
+                Gov Platform
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-1">
             {isLanding && (
               <>
-                <a href="#features" className={`text-sm font-medium nav-link-hover ${
-                  transparent ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-blue-600'
-                }`}>Features</a>
-                <a href="#how-it-works" className={`text-sm font-medium nav-link-hover ${
-                  transparent ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-blue-600'
-                }`}>How It Works</a>
-                <a href="#impact" className={`text-sm font-medium nav-link-hover ${
-                  transparent ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-blue-600'
-                }`}>Impact</a>
+                {[
+                  { href: '#features', label: 'Features' },
+                  { href: '#how-it-works', label: 'How It Works' },
+                  { href: '#use-cases', label: 'Use Cases' },
+                  { href: '#impact', label: 'Impact' },
+                ].map(({ href, label }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg nav-link-hover transition-all duration-200 hover:bg-black/5 ${textClass}`}
+                  >
+                    {label}
+                  </a>
+                ))}
               </>
-            )}
-
-            {showSearch && (
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                <input type="text" placeholder="Search..." className="pl-9 pr-4 py-2 text-sm bg-gray-50/50 border border-gray-100 rounded-xl outline-none focus:border-blue-300 w-48" />
-              </div>
-            )}
-
-            {showSearch && (
-              <>
-                <button className="relative p-2 rounded-xl hover:bg-gray-100/50 transition-all btn-press">
-                  <Bell className="w-5 h-5 text-gray-400" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-saffron-500" />
-                </button>
-                <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center hover-scale cursor-pointer shadow-md shadow-blue-500/15">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-              </>
-            )}
-
-            {!showSearch && (
-              <Link to="/login"
-                className="px-6 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-saffron-500 to-saffron-400 text-white hover:shadow-xl hover:shadow-saffron-500/25 transition-all btn-press"
-              >
-                Admin Login
-              </Link>
             )}
           </div>
 
+          {/* CTA */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/login"
+              className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:bg-black/5 ${textClass}`}
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/view/demo"
+              className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-saffron-500 to-saffron-400 text-white hover:shadow-xl hover:shadow-saffron-500/25 transition-all duration-300 btn-press btn-shine flex items-center gap-2"
+            >
+              Try Demo Free
+            </Link>
+          </div>
+
           {/* Mobile Toggle */}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden btn-press">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden btn-press p-2 rounded-lg hover:bg-black/5 transition-all">
             {menuOpen
-              ? <X className={`w-6 h-6 ${transparent ? 'text-white' : 'text-gray-700'}`} />
-              : <Menu className={`w-6 h-6 ${transparent ? 'text-white' : 'text-gray-700'}`} />
+              ? <X className={`w-6 h-6 ${textClass}`} />
+              : <Menu className={`w-6 h-6 ${textClass}`} />
             }
           </button>
         </div>
@@ -82,18 +100,33 @@ export default function Navbar({ transparent = false, showSearch = false }) {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden glass border-t border-white/30 animate-fade-in-up">
-          <div className="px-4 py-4 space-y-3">
+        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 animate-fade-in-up shadow-xl">
+          <div className="px-4 py-6 space-y-2">
             {isLanding && (
               <>
-                <a href="#features" className="block text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Features</a>
-                <a href="#how-it-works" className="block text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">How It Works</a>
-                <a href="#impact" className="block text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Impact</a>
+                {['Features', 'How It Works', 'Use Cases', 'Impact'].map((label) => (
+                  <a
+                    key={label}
+                    href={`#${label.toLowerCase().replace(/ /g, '-')}`}
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-xl transition-all"
+                  >
+                    {label}
+                  </a>
+                ))}
               </>
             )}
-            <Link to="/login" className="block w-full text-center px-5 py-2.5 rounded-full text-sm font-semibold gradient-saffron text-white btn-press">
-              Admin Login
-            </Link>
+            <div className="pt-3 border-t border-gray-100 space-y-2">
+              <Link to="/login" className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-xl transition-all">
+                Sign In
+              </Link>
+              <Link
+                to="/view/demo"
+                className="block w-full text-center px-5 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-saffron-500 to-saffron-400 text-white btn-press"
+              >
+                Try Demo Free
+              </Link>
+            </div>
           </div>
         </div>
       )}

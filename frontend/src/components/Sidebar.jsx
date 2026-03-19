@@ -1,13 +1,14 @@
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, UserPlus, MessageSquare, BarChart3, Settings,
-  LogOut, Globe, ChevronLeft, ChevronRight, HelpCircle, Shield,
+  LogOut, Globe, ChevronLeft, ChevronRight, HelpCircle, Shield, Layers,
 } from 'lucide-react'
 import { useState } from 'react'
 
 const allNavItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', roles: ['all'] },
   { icon: UserPlus, label: 'Create Avatar', path: '/create', roles: ['all'] },
+  { icon: Layers, label: 'Features', path: '/features', roles: ['all'] },
   { icon: MessageSquare, label: 'Messages', path: '/messages', roles: ['all'] },
   { icon: HelpCircle, label: 'Ask Avatar', path: '/ask-avatar', roles: ['all'] },
   { icon: BarChart3, label: 'Analytics', path: '/analytics', roles: ['admin', 'mp', 'mla'] },
@@ -40,12 +41,15 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="w-9 h-9 min-w-[36px] rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-blue-500/20 hover-scale">
-            <Globe className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-center relative w-9 h-9 min-w-[36px]">
+            <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-md"></div>
+            <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner hover-scale">
+              <Shield className="w-4 h-4 text-white" />
+            </div>
           </div>
           {!collapsed && (
-            <span className="font-heading font-bold text-lg text-gray-800 whitespace-nowrap">
-              Prati<span className="text-transparent bg-clip-text bg-gradient-to-r from-saffron-500 to-saffron-400">nidhi</span>
+            <span className="font-heading font-extrabold text-lg tracking-tight text-gray-900 whitespace-nowrap ml-1">
+              PRATI<span className="text-saffron-500">NIDHI</span><span className="text-primary-600 text-[9px] uppercase ml-1 align-top tracking-widest font-semibold">AI</span>
             </span>
           )}
         </Link>
