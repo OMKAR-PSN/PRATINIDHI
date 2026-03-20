@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { checkConsent } from '../services/api'
 import Sidebar from '../components/Sidebar'
 import {
   Upload, Wand2, ArrowRight, Play, CheckCircle2,
@@ -26,6 +27,7 @@ const languages = [
 ]
 
 export default function CreateAvatar() {
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
 
   // Step 1: Content
@@ -57,7 +59,27 @@ export default function CreateAvatar() {
     }
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    // GATE 1: Check token exists locally
+    const token = localStorage.getItem('consentToken')
+    if (!token) {
+      navigate('/consent')
+      return
+    }
+
+    // GATE 2: Double-check with server
+    const leaderId = localStorage.getItem('userRole') || 'admin'
+    try {
+      const res = await checkConsent(leaderId)
+      if (!res.data.has_consent) {
+        navigate('/consent')
+        return
+      }
+    } catch (e) {
+      navigate('/consent')
+      return
+    }
+
     setIsGenerating(true)
     let currentStep = 0
     const interval = setInterval(() => {

@@ -12,6 +12,10 @@ from tts import generate_speech
 from avatar import generate_avatar_video
 from utils import ensure_dirs, get_video_path, get_audio_path
 
+from database import test_connections, redis_client, supabase
+from routes import consent, health
+from signing import sign_video
+
 app = FastAPI(
     title="Pratinidhi AI",
     description="AI-powered governance communication platform for multilingual avatar announcements",
@@ -27,6 +31,11 @@ app.add_middleware(
 )
 
 ensure_dirs()
+test_connections()
+
+app.include_router(consent.router)
+app.include_router(health.router)
+
 app.mount("/output", StaticFiles(directory="../output"), name="output")
 app.mount("/avatars", StaticFiles(directory="../avatars"), name="avatars")
 
@@ -34,7 +43,107 @@ app.mount("/avatars", StaticFiles(directory="../avatars"), name="avatars")
 avatars_db = {}
 messages_db = []
 consent_db = {}
+users_db = {}  # email -> {name, email, phone, password_hash, role}
 
+import hashlib as _hashlib
+
+# ==================== Auth Endpoints ====================
+
+class SignUpRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    password: str
+    role: str = "admin"
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/signup")
+async def auth_signup(req: SignUpRequest):
+    pw_hash = _hashlib.sha256(req.password.encode()).hexdigest()
+    
+    if supabase:
+        try:
+            # Check if exists by email or phone (using email since it's the login mechanism now)
+            result = supabase.table("leaders").select("id").eq("email", req.email).execute()
+            if result.data:
+                raise HTTPException(400, "Email already registered")
+            
+            insert_result = supabase.table("leaders").insert({
+                "email": req.email,
+                "name": req.name,
+                "phone": req.phone,
+                "password_hash": pw_hash,
+                "role": req.role,
+            }).execute()
+            
+            leader_id = insert_result.data[0]["id"]
+            return {"message": "Account created in Cloud DB", "email": req.email, "role": req.role, "leader_id": leader_id}
+        except Exception as e:
+            if "duplicate key" in str(e).lower() or getattr(e, "code", "") == "23505":
+                raise HTTPException(400, "Email or phone already registered")
+            print(f"Warning: Cloud DB error {e}")
+            raise HTTPException(500, f"Database error during signup: {e}")
+    
+    # Fallback to local memory ONLY if Supabase is completely unconfigured
+    if req.email in users_db:
+        raise HTTPException(400, "Email already registered")
+        
+    leader_id = "mock-uuid-" + req.email.split("@")[0]
+    users_db[req.email] = {
+        "id": leader_id,
+        "name": req.name,
+        "email": req.email,
+        "phone": req.phone,
+        "password_hash": pw_hash,
+        "role": req.role,
+    }
+    return {"message": "Account created (Local Session)", "email": req.email, "role": req.role, "leader_id": leader_id}
+
+
+@app.post("/api/auth/login")
+async def auth_login(req: LoginRequest):
+    pw_hash = _hashlib.sha256(req.password.encode()).hexdigest()
+    
+    if supabase:
+        try:
+            result = supabase.table("leaders").select("*").eq("email", req.email).execute()
+            if not result.data:
+                raise HTTPException(401, "Invalid email or password")
+            user = result.data[0]
+            
+            # Temporary safety check if people haven't added password_hash yet
+            if "password_hash" not in user or user.get("password_hash") != pw_hash:
+                raise HTTPException(401, "Invalid email or password")
+                
+            return {
+                "message": "Login successful (Cloud DB)",
+                "email": user.get("email", req.email),
+                "name": user.get("name", ""),
+                "phone": user.get("phone", ""),
+                "role": user.get("role", "admin"),
+                "leader_id": user["id"],
+            }
+        except Exception as e:
+            if isinstance(e, HTTPException): raise e
+            print(f"Warning: Cloud DB error {e}")
+            raise HTTPException(500, f"Database error during login: {e}")
+            
+    # Fallback to local
+    user = users_db.get(req.email)
+    if not user or user.get("password_hash") != pw_hash:
+        raise HTTPException(401, "Invalid email or password")
+        
+    return {
+        "message": "Login successful (Local Session)",
+        "email": user["email"],
+        "name": user.get("name", ""),
+        "phone": user.get("phone", ""),
+        "role": user.get("role", "admin"),
+        "leader_id": user.get("id", "mock-uuid"),
+    }
 
 # ==================== Models ====================
 
@@ -78,7 +187,27 @@ async def create_avatar(
     language: str = Form(default="hi"),
     voice: str = Form(default="standard"),
     style: str = Form(default="realistic"),
+    leader_id: str = Form(default="admin"),
+    consent_token: str = Form(default="")
 ):
+    # GATE 1: Check consent token is valid in Redis/Cache
+    if not consent_token:
+        raise HTTPException(403, "No valid consent. Leader must verify OTP first.")
+        
+    session_leader = redis_client.get(f"session:{consent_token}")
+    if session_leader != leader_id:
+        raise HTTPException(403, "Invalid or expired consent token.")
+    
+    # GATE 2: Double-check consent record exists in Supabase
+    if supabase:
+        consent_record = supabase.table("consent_records")\
+            .select("*")\
+            .eq("leader_id", leader_id)\
+            .eq("is_active", True)\
+            .execute()
+        if not consent_record.data:
+            raise HTTPException(403, "Consent record not found in database.")
+
     avatar_id = uuid.uuid4().hex[:12]
     try:
         file_ext = os.path.splitext(image.filename)[1] or ".jpg"
@@ -92,6 +221,30 @@ async def create_avatar(
 
         video_path = get_video_path(avatar_id)
         generate_avatar_video(image_path, audio_path, video_path)
+        
+        # Sign the generated video
+        signature = None
+        if os.path.exists(video_path):
+            sig_data = sign_video(video_path, leader_id, consent_token)
+            signature = sig_data["signed_token"]
+            
+            # Save signature to Supabase
+            if supabase:
+                try:
+                    supabase.table("avatar_signatures").insert({
+                        "leader_id": leader_id,
+                        "video_hash": sig_data["video_hash"],
+                        "signed_token": signature
+                    }).execute()
+                    
+                    # Log it
+                    supabase.table("audit_logs").insert({
+                        "leader_id": leader_id,
+                        "action": "avatar_generated",
+                        "metadata": {"language": language, "video_hash": sig_data["video_hash"]}
+                    }).execute()
+                except Exception as e:
+                    print(f"Warning: Failed to log signature: {e}")
 
         data = {
             "id": avatar_id,
@@ -103,7 +256,8 @@ async def create_avatar(
             "video_url": f"/output/videos/{avatar_id}.mp4",
             "created_at": datetime.now().isoformat(),
             "status": "completed",
-            "consent_status": "pending",
+            "consent_status": "approved",
+            "signature": signature
         }
         avatars_db[avatar_id] = data
         messages_db.append({
@@ -119,6 +273,7 @@ async def create_avatar(
             "videoUrl": data["video_url"],
             "transcript": translated,
             "language": language,
+            "signature": signature
         }
     except Exception as e:
         raise HTTPException(500, f"Generation failed: {str(e)}")

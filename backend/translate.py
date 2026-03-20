@@ -3,7 +3,7 @@ Translation Module
 Uses googletrans for translating government announcements into regional languages.
 """
 
-from googletrans import Translator
+# from googletrans import Translator
 
 # Language code mapping for Indian languages
 LANGUAGE_MAP = {
@@ -34,6 +34,7 @@ def translate_text(text: str, language: str) -> str:
         Translated text string.
     """
     try:
+        from googletrans import Translator
         translator = Translator()
         result = translator.translate(text, dest=language)
         return result.text

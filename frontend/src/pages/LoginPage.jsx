@@ -21,11 +21,25 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => { 
-      localStorage.setItem('userRole', role)
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Login failed')
+      
+      localStorage.setItem('userRole', data.role || role)
+      localStorage.setItem('userEmail', data.email || email)
+      if (data.phone) localStorage.setItem('userPhone', data.phone)
+      if (data.name) localStorage.setItem('userName', data.name)
       setLoading(false)
-      navigate('/dashboard') 
-    }, 1200)
+      navigate('/dashboard')
+    } catch (err) {
+      alert(err.message || 'Invalid email or password');
+      setLoading(false);
+    }
   }
 
   return (
@@ -45,7 +59,7 @@ export default function LoginPage() {
           <h1 className="font-heading text-4xl font-bold text-white tracking-tight">Prati<span className="text-saffron-400">nidhi</span> AI</h1>
           <p className="text-white/50 mt-3 text-lg max-w-md">AI-powered governance communication platform for multilingual avatar announcements.</p>
           <div className="mt-12 flex flex-wrap justify-center gap-3">
-            {['22+ Languages', 'Lip-Sync Avatars', 'OTP Consent Lock'].map((tag) => (
+            {['22+ Languages', 'Lip-Sync Avatars', 'Multi-Method Consent'].map((tag) => (
               <span key={tag} className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 text-sm text-white/60 flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3 text-saffron-400" />
                 {tag}
@@ -102,6 +116,10 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-500">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-500 font-medium hover:underline">Sign Up</Link>
+          </p>
+          <p className="mt-2 text-center text-sm text-gray-500">
             <Link to="/" className="text-blue-500 font-medium hover:underline">← Back to home</Link>
           </p>
         </div>
