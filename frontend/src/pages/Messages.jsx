@@ -1,221 +1,227 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-import StatCard from '../components/StatCard'
+import { getMessageHistory, markAsRead } from '../services/api'
 import { 
-  MessageSquare, Globe, Eye, Filter, Calendar, Activity, 
-  CheckCircle2, Video, Users, ArrowRight, PlayCircle
+  MessageSquare, Send, Inbox, Clock, CheckCircle2, XCircle, 
+  Eye, Play, MoreVertical, Globe, BarChart3, Loader2 
 } from 'lucide-react'
 
-// Rich Demo Data to populate the dashboard and table
-const initialDemoMessages = [
-  { 
-    id: 'msg-kisan', 
-    title: 'PM Kisan Yojana Updates', 
-    original_text: 'Dear citizens, the registration for PM Kisan Yojana is now open for the next quarter. Please ensure your e-KYC is completed by the end of this month.',
-    language: 'hi', 
-    status: 'completed', 
-    regions: ['North India', 'Central India'], 
-    reach: 125000,
-    views: 45200, 
-    engagement: 82, 
-    created_at: new Date().toISOString(),
-    video_url: '/output/videos/demo.mp4'
-  },
-  { 
-    id: 'msg-health', 
-    title: 'Healthcare Expansion (Ayushman)', 
-    original_text: 'Ayushman Bharat now covers 5 new regional hospitals in your district. Eligible families can claim up to 5 Lakhs in free treatment. Visit your nearest CSC to apply.',
-    language: 'ta', 
-    status: 'completed', 
-    regions: ['South India'], 
-    reach: 89000,
-    views: 32000, 
-    engagement: 74, 
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    video_url: '/output/videos/demo.mp4'
-  },
-  { 
-    id: 'msg-edu', 
-    title: 'Girl Child Scholarship Launch', 
-    original_text: 'Announcing the new Beti Bachao Beti Padhao regional scholarship for higher education. All female students scoring above 80% are eligible.',
-    language: 'bn', 
-    status: 'completed', 
-    regions: ['East India'], 
-    reach: 210000,
-    views: 98000, 
-    engagement: 91, 
-    created_at: new Date(Date.now() - 172800000).toISOString(),
-    video_url: '/output/videos/demo.mp4'
-  },
-  { 
-    id: 'msg-cyclone', 
-    title: 'Cyclone Alert & Safety Guidelines', 
-    original_text: 'Warning: Severe cyclonic storm approaching the coastal areas in the next 48 hours. Please move to designated safe shelters and avoid the sea.',
-    language: 'or', 
-    status: 'completed', 
-    regions: ['East India', 'South India'], 
-    reach: 450000,
-    views: 310000, 
-    engagement: 95, 
-    created_at: new Date(Date.now() - 259200000).toISOString(),
-    video_url: '/output/videos/demo.mp4'
-  },
-  { 
-    id: 'msg-farm', 
-    title: 'Organic Farming Subsidies', 
-    original_text: 'Government is providing a 50% subsidy on organic fertilizers for the Rabi crop season. Apply through the local Panchayat office before Friday.',
-    language: 'mr', 
-    status: 'processing', 
-    regions: ['West India'], 
-    reach: 75000,
-    views: 12000, 
-    engagement: 45, 
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    video_url: null
-  }
-]
-
 export default function Messages() {
-  const [messages, setMessages] = useState(initialDemoMessages)
+  const [activeTab, setActiveTab] = useState('sent') // 'sent' | 'inbox'
+  const [loading, setLoading] = useState(true)
+  const [messages, setMessages] = useState({ sent: [], inbox: [] })
+  
+  const leaderId = localStorage.getItem('leaderId')
 
-  // Calculate Dashboard Stats dynamically from the local demo array
-  const totalReach = messages.reduce((acc, curr) => acc + curr.reach, 0)
-  const totalViews = messages.reduce((acc, curr) => acc + curr.views, 0)
-  const avgEngagement = Math.round(messages.reduce((acc, curr) => acc + curr.engagement, 0) / messages.length)
-  const uniqueLangs = new Set(messages.map(m => m.language)).size
+  const fetchHistory = async () => {
+    try {
+      const { data } = await getMessageHistory(leaderId || 'admin')
+      setMessages(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (leaderId) fetchHistory()
+  }, [leaderId])
+
+  const handleRead = async (id) => {
+    try {
+      await markAsRead(id, leaderId)
+      fetchHistory() // Refresh to update Read status and badge
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   return (
-    <div className="min-h-screen gradient-subtle tech-grid">
+    <div className="min-h-screen gradient-subtle tech-grid flex">
       <Sidebar />
-      <div className="ml-64 p-8">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+      <div className="ml-64 p-8 flex-1">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight">Messages & Broadcasts</h1>
-            <p className="text-gray-500 text-sm mt-1">Review historic announcements, content details, and performance statistics.</p>
+            <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 text-blue-600" /> Messages
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">Full communication history and real-time updates</p>
           </div>
-          <Link to="/create" className="px-5 py-2.5 rounded-xl gradient-primary text-white font-semibold text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all btn-press flex items-center gap-2">
-            <Video className="w-4 h-4" /> New Broadcast
-          </Link>
-        </div>
-
-        {/* Dashboard Top Level Stats */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <StatCard icon={MessageSquare} title="Total Broadcasts" value={messages.length} change="+2 this week" changeType="up" color="blue" />
-          <StatCard icon={Users} title="Cumulative Reach" value={`${(totalReach / 1000).toFixed(0)}K`} change="Citizens" changeType="neutral" color="saffron" />
-          <StatCard icon={Eye} title="Total Video Views" value={`${(totalViews / 1000).toFixed(0)}K`} change="+12%" changeType="up" color="emerald" />
-          <StatCard icon={Activity} title="Avg Engagement" value={`${avgEngagement}%`} change="High" changeType="up" color="purple" />
-        </div>
-
-        {/* Messages Data Table */}
-        <div className="glass-card rounded-2xl overflow-hidden shadow-sm">
-          {/* Toolbar */}
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-                <Filter className="w-3.5 h-3.5" /> Filter by Region
-              </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-                <Globe className="w-3.5 h-3.5" /> All Languages
-              </button>
-            </div>
-            <div className="text-sm font-semibold text-gray-500">
-             Showing {messages.length} items
-            </div>
-          </div>
-
-          <div className="w-full overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50/50 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                  <th className="px-6 py-4 w-1/3">Original Content & Details</th>
-                  <th className="px-6 py-4">Delivery</th>
-                  <th className="px-6 py-4 text-center">Performance Stats</th>
-                  <th className="px-6 py-4">Video & Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100/50 bg-white/40">
-                {messages.map((m) => (
-                  <tr key={m.id} className="hover:bg-gray-50/50 transition-colors group">
-                    {/* Content Column */}
-                    <td className="px-6 py-5">
-                      <div className="font-heading font-bold text-gray-900 text-sm mb-1">{m.title}</div>
-                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed italic border-l-2 border-blue-200 pl-2">
-                        "{m.original_text}"
-                      </p>
-                      <div className="text-[10px] text-gray-400 mt-2 font-medium uppercase">
-                        {new Date(m.created_at).toLocaleDateString()} at {new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </div>
-                    </td>
-
-                    {/* Delivery Column */}
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <Globe className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="font-bold text-blue-600 uppercase bg-blue-50 px-2 py-0.5 rounded">{m.language}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {m.regions.map(r => (
-                            <span key={r} className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-semibold text-gray-600 border border-gray-200/50">{r}</span>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Stats Column */}
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-2">
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                          <div className="text-[11px] text-gray-500">Reach</div>
-                          <div className="text-xs font-bold text-gray-900 text-right">{(m.reach / 1000).toFixed(1)}K</div>
-                          
-                          <div className="text-[11px] text-gray-500">Video Views</div>
-                          <div className="text-xs font-bold text-emerald-600 text-right">{(m.views / 1000).toFixed(1)}K</div>
-                          
-                          <div className="text-[11px] text-gray-500">Engagement</div>
-                          <div className="text-xs font-bold text-saffron-600 text-right">{m.engagement}%</div>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                          <div className="h-full gradient-primary rounded-full transition-all" style={{ width: `${m.engagement}%` }} />
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Status & Video Column */}
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col items-start gap-2">
-                        <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                          m.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {m.status === 'completed' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />}
-                          {m.status}
-                        </div>
-                        {m.video_url && m.status === 'completed' && (
-                          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-500 mt-1 cursor-pointer hover:text-blue-600 transition-colors">
-                            <PlayCircle className="w-4 h-4" /> <span>Avatar Ready</span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Actions Column */}
-                    <td className="px-6 py-5 text-right">
-                      <Link to={m.id === 'msg-kisan' ? '/preview/demo' : `/preview/${m.id}`} className="group inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors btn-press">
-                        View Portal <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex bg-white/50 p-1 rounded-xl shadow-inner border border-gray-200/50">
+            <button 
+              onClick={() => setActiveTab('sent')}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                activeTab === 'sent' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Send className="w-4 h-4" /> Sent
+            </button>
+            <button 
+              onClick={() => setActiveTab('inbox')}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                activeTab === 'inbox' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Inbox className="w-4 h-4" /> Inbox
+              {messages.inbox.filter(m => !m.is_read).length > 0 && (
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse ml-0.5" />
+              )}
+            </button>
           </div>
         </div>
 
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-64 opacity-50">
+            <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-2" />
+            <p className="text-sm font-semibold">Retrieving your message vault...</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {activeTab === 'sent' ? (
+              messages.sent.length === 0 ? (
+                <EmptyState icon={Send} text="You haven't sent any broadcasts yet." />
+              ) : (
+                messages.sent.map(msg => (
+                  <SentMessageCard key={msg.id} msg={msg} />
+                ))
+              )
+            ) : (
+              messages.inbox.length === 0 ? (
+                <EmptyState icon={Inbox} text="Your inbox is currently empty." />
+              ) : (
+                messages.inbox.map(msg => (
+                  <InboxMessageCard key={msg.id} msg={msg} onRead={() => handleRead(msg.id)} />
+                ))
+              )
+            )}
+          </div>
+        )}
       </div>
+    </div>
+  )
+}
+
+function SentMessageCard({ msg }) {
+  return (
+    <div className="glass-card rounded-2xl p-6 border-l-4 border-blue-500 shadow-sm transition-all hover:shadow-md">
+      <div className="grid lg:grid-cols-5 gap-6 items-center">
+        {/* Original Content & Details */}
+        <div className="lg:col-span-2 space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Sent Broadcast</span>
+            <span className="text-[10px] text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(msg.created_at).toLocaleString()}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-800 line-clamp-2">{msg.message_text}</p>
+          <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-1 text-[11px] text-gray-500">
+              <Globe className="w-3 h-3 text-saffron-500" /> {msg.original_language || 'Hindi'}
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-gray-500">
+              <Eye className="w-3 h-3 text-blue-500" /> {msg.total_receivers} Targets
+            </div>
+          </div>
+        </div>
+
+        {/* Delivery */}
+        <div className="space-y-3">
+          <p className="text-[11px] font-bold text-gray-400 uppercase">Delivery Check</p>
+          <div className="flex gap-2">
+            <DeliveryIndicator label="Email" status={msg.sent_count > 0 ? 'sent' : 'pending'} />
+            <DeliveryIndicator label="WA" status={msg.sent_count > 0 ? 'sent' : 'pending'} />
+            <DeliveryIndicator label="SMS" status={msg.sent_count > 0 ? 'sent' : 'pending'} />
+          </div>
+        </div>
+
+        {/* Performance Stats */}
+        <div className="space-y-3">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Performance</p>
+          <div className="flex items-center gap-4">
+             <div className="text-center">
+               <p className="text-lg font-extrabold text-emerald-600">{msg.sent_count}</p>
+               <p className="text-[10px] font-bold text-gray-400">SUCCESS</p>
+             </div>
+             <div className="w-px h-8 bg-gray-100" />
+             <div className="text-center">
+               <p className="text-lg font-extrabold text-red-500">{msg.failed_count}</p>
+               <p className="text-[10px] font-bold text-gray-400">FAILED</p>
+             </div>
+          </div>
+        </div>
+
+        {/* Video & Status + Actions */}
+        <div className="flex items-center justify-between lg:justify-end gap-3">
+          <div className="text-right">
+             <span className="badge-tech bg-emerald-50 text-emerald-700 flex items-center gap-1 ml-auto">
+               <CheckCircle2 className="w-3 h-3" /> Completed
+             </span>
+             <p className="text-[10px] text-gray-400 mt-1">ID: ...{msg.id.slice(-6)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="p-2.5 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all btn-press">
+              <BarChart3 className="w-4 h-4" />
+            </button>
+            <button className="p-2.5 rounded-xl gradient-primary text-white shadow-lg shadow-blue-500/20 hover:scale-105 transition-all btn-press">
+              <Play className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function InboxMessageCard({ msg, onRead }) {
+  return (
+    <div 
+      onClick={onRead}
+      className={`glass-card rounded-2xl p-5 border-l-4 transition-all cursor-pointer hover:shadow-md ${
+        msg.is_read ? 'border-gray-200' : 'border-saffron-500 shadow-sm'
+      }`}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 min-w-[40px] rounded-xl flex items-center justify-center ${
+          msg.is_read ? 'bg-gray-100 text-gray-400' : 'bg-saffron-100 text-saffron-600'
+        }`}>
+          <MessageSquare className="w-5 h-5" />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+              {msg.sender_name}
+              {!msg.is_read && <span className="w-2 h-2 rounded-full bg-saffron-500" />}
+            </h4>
+            <span className="text-[11px] text-gray-400">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <p className={`text-sm leading-relaxed ${msg.is_read ? 'text-gray-500' : 'text-gray-700 font-medium'}`}>{msg.message_text}</p>
+          {msg.original_text && <p className="text-[11px] text-gray-400 italic">Org: {msg.original_text}</p>}
+        </div>
+        <button className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
+          <MoreVertical className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function DeliveryIndicator({ label, status }) {
+  const styles = {
+    sent: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    failed: 'bg-red-50 text-red-700 border-red-100',
+    pending: 'bg-gray-50 text-gray-400 border-gray-100'
+  }
+  return (
+    <div className={`px-2 py-1 rounded-lg border text-[10px] font-bold ${styles[status]}`}>
+      {label}
+    </div>
+  )
+}
+
+function EmptyState({ icon: Icon, text }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50">
+      <Icon className="w-12 h-12 text-gray-200 mb-4" />
+      <p className="text-gray-500 font-medium">{text}</p>
     </div>
   )
 }

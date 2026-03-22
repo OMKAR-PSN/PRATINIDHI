@@ -12,8 +12,9 @@ from tts import generate_speech
 from avatar import generate_avatar_video
 from utils import ensure_dirs, get_video_path, get_audio_path
 
-from database import test_connections, redis_client, supabase
-from routes import consent, health
+from database import test_connections, redis_client, db_execute
+from routes import consent, health, auth, receivers
+import notifications
 from signing import sign_video
 
 app = FastAPI(
@@ -33,8 +34,10 @@ app.add_middleware(
 ensure_dirs()
 test_connections()
 
-app.include_router(consent.router)
-app.include_router(health.router)
+app.include_router(consent.router, prefix="/api")
+app.include_router(health.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(receivers.router, prefix="/api")
 
 app.mount("/output", StaticFiles(directory="../output"), name="output")
 app.mount("/avatars", StaticFiles(directory="../avatars"), name="avatars")
@@ -47,103 +50,7 @@ users_db = {}  # email -> {name, email, phone, password_hash, role}
 
 import hashlib as _hashlib
 
-# ==================== Auth Endpoints ====================
 
-class SignUpRequest(BaseModel):
-    name: str
-    email: str
-    phone: str
-    password: str
-    role: str = "admin"
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-@app.post("/api/auth/signup")
-async def auth_signup(req: SignUpRequest):
-    pw_hash = _hashlib.sha256(req.password.encode()).hexdigest()
-    
-    if supabase:
-        try:
-            # Check if exists by email or phone (using email since it's the login mechanism now)
-            result = supabase.table("leaders").select("id").eq("email", req.email).execute()
-            if result.data:
-                raise HTTPException(400, "Email already registered")
-            
-            insert_result = supabase.table("leaders").insert({
-                "email": req.email,
-                "name": req.name,
-                "phone": req.phone,
-                "password_hash": pw_hash,
-                "role": req.role,
-            }).execute()
-            
-            leader_id = insert_result.data[0]["id"]
-            return {"message": "Account created in Cloud DB", "email": req.email, "role": req.role, "leader_id": leader_id}
-        except Exception as e:
-            if "duplicate key" in str(e).lower() or getattr(e, "code", "") == "23505":
-                raise HTTPException(400, "Email or phone already registered")
-            print(f"Warning: Cloud DB error {e}")
-            raise HTTPException(500, f"Database error during signup: {e}")
-    
-    # Fallback to local memory ONLY if Supabase is completely unconfigured
-    if req.email in users_db:
-        raise HTTPException(400, "Email already registered")
-        
-    leader_id = "mock-uuid-" + req.email.split("@")[0]
-    users_db[req.email] = {
-        "id": leader_id,
-        "name": req.name,
-        "email": req.email,
-        "phone": req.phone,
-        "password_hash": pw_hash,
-        "role": req.role,
-    }
-    return {"message": "Account created (Local Session)", "email": req.email, "role": req.role, "leader_id": leader_id}
-
-
-@app.post("/api/auth/login")
-async def auth_login(req: LoginRequest):
-    pw_hash = _hashlib.sha256(req.password.encode()).hexdigest()
-    
-    if supabase:
-        try:
-            result = supabase.table("leaders").select("*").eq("email", req.email).execute()
-            if not result.data:
-                raise HTTPException(401, "Invalid email or password")
-            user = result.data[0]
-            
-            # Temporary safety check if people haven't added password_hash yet
-            if "password_hash" not in user or user.get("password_hash") != pw_hash:
-                raise HTTPException(401, "Invalid email or password")
-                
-            return {
-                "message": "Login successful (Cloud DB)",
-                "email": user.get("email", req.email),
-                "name": user.get("name", ""),
-                "phone": user.get("phone", ""),
-                "role": user.get("role", "admin"),
-                "leader_id": user["id"],
-            }
-        except Exception as e:
-            if isinstance(e, HTTPException): raise e
-            print(f"Warning: Cloud DB error {e}")
-            raise HTTPException(500, f"Database error during login: {e}")
-            
-    # Fallback to local
-    user = users_db.get(req.email)
-    if not user or user.get("password_hash") != pw_hash:
-        raise HTTPException(401, "Invalid email or password")
-        
-    return {
-        "message": "Login successful (Local Session)",
-        "email": user["email"],
-        "name": user.get("name", ""),
-        "phone": user.get("phone", ""),
-        "role": user.get("role", "admin"),
-        "leader_id": user.get("id", "mock-uuid"),
-    }
 
 # ==================== Models ====================
 
@@ -159,6 +66,18 @@ class ConsentRequest(BaseModel):
 class ConsentVerify(BaseModel):
     avatar_id: str
     otp: str
+
+class BroadcastRequest(BaseModel):
+    leader_id: str
+    message: str
+    translated_text: str
+    language: str
+
+class BroadcastRequest(BaseModel):
+    leader_id: str
+    message: str
+    translated_text: str
+    language: str
 
 
 # ==================== Core Endpoints ====================
@@ -198,15 +117,17 @@ async def create_avatar(
     if session_leader != leader_id:
         raise HTTPException(403, "Invalid or expired consent token.")
     
-    # GATE 2: Double-check consent record exists in Supabase
-    if supabase:
-        consent_record = supabase.table("consent_records")\
-            .select("*")\
-            .eq("leader_id", leader_id)\
-            .eq("is_active", True)\
-            .execute()
-        if not consent_record.data:
+    # Double-check consent record exists in Neon and email is verified
+    try:
+        consent_record = db_execute("SELECT * FROM consent_records WHERE leader_id = %s AND is_active = TRUE", (leader_id,), fetchall=True)
+        if not consent_record or len(consent_record) == 0:
             raise HTTPException(403, "Consent record not found in database.")
+        
+        # Require 1 layer: Biometric Face Verification
+        if not consent_record[0].get("face_verified"):
+            raise HTTPException(403, "Biometric face verification is missing. Please complete the face scan identity challenge.")            
+    except Exception as e:
+        if isinstance(e, HTTPException): raise e
 
     avatar_id = uuid.uuid4().hex[:12]
     try:
@@ -228,23 +149,19 @@ async def create_avatar(
             sig_data = sign_video(video_path, leader_id, consent_token)
             signature = sig_data["signed_token"]
             
-            # Save signature to Supabase
-            if supabase:
-                try:
-                    supabase.table("avatar_signatures").insert({
-                        "leader_id": leader_id,
-                        "video_hash": sig_data["video_hash"],
-                        "signed_token": signature
-                    }).execute()
-                    
-                    # Log it
-                    supabase.table("audit_logs").insert({
-                        "leader_id": leader_id,
-                        "action": "avatar_generated",
-                        "metadata": {"language": language, "video_hash": sig_data["video_hash"]}
-                    }).execute()
-                except Exception as e:
-                    print(f"Warning: Failed to log signature: {e}")
+            # Save signature to Neon
+            try:
+                db_execute(
+                    "INSERT INTO avatar_signatures (leader_id, video_hash, signed_token, language) VALUES (%s, %s, %s, %s)",
+                    (leader_id, sig_data["video_hash"], signature, language),
+                    commit=True
+                )
+                
+                # Log it
+                from database import log_audit
+                log_audit(leader_id, "avatar_generated", {"language": language, "video_hash": sig_data["video_hash"]})
+            except Exception as e:
+                print(f"Warning: Failed to log signature: {e}")
 
         data = {
             "id": avatar_id,
@@ -277,6 +194,153 @@ async def create_avatar(
         }
     except Exception as e:
         raise HTTPException(500, f"Generation failed: {str(e)}")
+
+
+@app.get("/api/messages/unread")
+async def get_unread_count(leader_id: str):
+    if not redis_client:
+        return {"count": 0}
+    count = redis_client.get(f"unread:{leader_id}")
+    return {"count": int(count) if count else 0}
+
+@app.post("/api/messages/send")
+async def send_message(req: BroadcastRequest):
+    if not req.leader_id or req.leader_id == "admin":
+        raise HTTPException(status_code=400, detail="Invalid leader session")
+
+    # 1. Fetch receivers
+    receivers_list = db_execute(
+        "SELECT id, receiver_phone, receiver_email, language, has_whatsapp, is_app_user, app_user_id FROM leader_receivers WHERE leader_id = %s",
+        (req.leader_id,),
+        fetchall=True
+    )
+    
+    if not receivers_list:
+        raise HTTPException(status_code=400, detail="You have no receivers in your list.")
+
+    # 2. Log parent message
+    msg_res = db_execute(
+        """INSERT INTO messages (sender_id, message_text, original_language, total_receivers) 
+           VALUES (%s, %s, %s, %s) RETURNING id""",
+        (req.leader_id, req.message, req.language, len(receivers_list)),
+        commit=True,
+        fetchone=True
+    )
+    message_id = msg_res['id']
+
+    sent = 0
+    failed = 0
+
+    # 3. Dispatch
+    for r in receivers_list:
+        try:
+            p_email = "pending"
+            p_wa = "pending"
+            p_sms = "pending"
+            err_reason = []
+            receiver_success = False
+            
+            trans_text = req.translated_text
+            
+            # Inbox for App Users
+            if r.get("is_app_user") and r.get("app_user_id"):
+                db_execute(
+                    """INSERT INTO inbox_messages (recipient_leader_id, sender_leader_id, message_id, message_text, original_text)
+                       VALUES (%s, %s, %s, %s, %s)""",
+                    (r["app_user_id"], req.leader_id, message_id, trans_text, req.message),
+                    commit=True
+                )
+                if redis_client:
+                    redis_client.incr(f"unread:{r['app_user_id']}")
+                receiver_success = True
+                p_wa = "inbox"
+
+            # Email
+            if r.get("receiver_email"):
+                email_body = f"<h2>Announcement</h2><p>{trans_text}</p><p><i>Original: {req.message}</i></p>"
+                ok, msg = notifications.send_email(r["receiver_email"], "Official Announcement", email_body)
+                if ok:
+                    p_email = "sent"
+                    receiver_success = True
+                else:
+                    p_email = "failed"
+                    err_reason.append(f"Email: {msg}")
+
+            # WhatsApp
+            if r.get("has_whatsapp") and r.get("receiver_phone"):
+                wa_text = f"Official Announcement:\n{trans_text}"
+                ok, msg = notifications.send_whatsapp(r["receiver_phone"], wa_text)
+                if ok:
+                    p_wa = "sent"
+                    receiver_success = True
+                else:
+                    p_wa = "failed"
+                    err_reason.append(f"WhatsApp: {msg}")
+
+            # SMS
+            if r.get("receiver_phone"):
+                sms_text = f"Announcement: {trans_text}"
+                ok, msg = notifications.send_sms(r["receiver_phone"], sms_text)
+                if ok:
+                    p_sms = "sent"
+                    receiver_success = True
+                else:
+                    p_sms = "failed"
+                    err_reason.append(f"SMS: {msg}")
+
+            if receiver_success:
+                sent += 1
+            else:
+                failed += 1
+
+            db_execute(
+                """INSERT INTO message_recipients (message_id, receiver_id, translated_text, email_status, whatsapp_status, sms_status, error_reason)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (message_id, r["id"], trans_text, p_email, p_wa, p_sms, "; ".join(err_reason)),
+                commit=True
+            )
+        except Exception as dispatch_err:
+            print(f"⚠️ Dispatch error for receiver {r.get('id')}: {dispatch_err}")
+            failed += 1
+
+    db_execute(
+        "UPDATE messages SET sent_count = %s, failed_count = %s, completed_at = NOW() WHERE id = %s",
+        (sent, failed, message_id),
+        commit=True
+    )
+
+    return {"success": True, "message_id": str(message_id), "sent": sent, "failed": failed}
+
+@app.get("/api/messages/history")
+async def get_message_history(leader_id: str):
+    sent = db_execute(
+        "SELECT * FROM messages WHERE sender_id = %s ORDER BY created_at DESC",
+        (leader_id,),
+        fetchall=True
+    )
+    inbox = db_execute(
+        """SELECT i.*, l.name as sender_name 
+           FROM inbox_messages i 
+           JOIN leaders l ON i.sender_leader_id = l.id 
+           WHERE i.recipient_leader_id = %s 
+           ORDER BY i.created_at DESC""",
+        (leader_id,),
+        fetchall=True
+    )
+    return {"sent": sent or [], "inbox": inbox or []}
+
+@app.post("/api/messages/read/{msg_id}")
+async def mark_as_read(msg_id: str, leader_id: str):
+    db_execute(
+        "UPDATE inbox_messages SET is_read = TRUE, read_at = NOW() WHERE id = %s AND recipient_leader_id = %s AND is_read = FALSE",
+        (msg_id, leader_id),
+        commit=True
+    )
+    if redis_client:
+        count = redis_client.get(f"unread:{leader_id}")
+        if count and int(count) > 0:
+            redis_client.decr(f"unread:{leader_id}")
+    return {"success": True}
 
 
 @app.get("/api/avatar/{avatar_id}")

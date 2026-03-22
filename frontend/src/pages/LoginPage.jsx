@@ -34,9 +34,11 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })
-      const data = await res.json()
+      let data
+      try { data = await res.json() } catch { data = { detail: 'Server error. Please try again.' } }
       if (!res.ok) throw new Error(data.detail || 'Login failed')
       
+      localStorage.setItem('leaderId', data.id)
       localStorage.setItem('userRole', data.role || role)
       localStorage.setItem('userEmail', data.email || email)
       if (data.phone) localStorage.setItem('userPhone', data.phone)

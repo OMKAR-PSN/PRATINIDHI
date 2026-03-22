@@ -4,3 +4,9 @@ python-multipart==0.0.9
 googletrans==4.0.0-rc.1
 gTTS==2.5.1
 aiofiles==23.2.1
+psycopg2-binary
+motor
+redis
+python-jose[cryptography]
+python-dotenv
+resend

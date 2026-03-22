@@ -11,7 +11,8 @@ import Settings from './pages/Settings'
 import AskAvatar from './pages/AskAvatar'
 import Messages from './pages/Messages'
 import ConsentOTP from './pages/ConsentOTP'
-import FeaturesPage from './pages/FeaturesPage'
+import ConsentVerify from './pages/ConsentVerify'
+import Receivers from './pages/Receivers'
 
 function App() {
   return (
@@ -21,14 +22,15 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/features" element={<FeaturesPage />} />
         <Route path="/create" element={<CreateAvatar />} />
         <Route path="/preview" element={<AvatarPreview />} />
         <Route path="/preview/:id" element={<AvatarPreview />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/view/:id" element={<CitizenView />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/receivers" element={<Receivers />} />
         <Route path="/consent" element={<ConsentOTP />} />
+        <Route path="/consent/verify" element={<ConsentVerify />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/ask-avatar" element={<AskAvatar />} />
       </Routes>

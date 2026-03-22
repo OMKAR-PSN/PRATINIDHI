@@ -1,11 +1,12 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AvatarPlayer from '../components/AvatarPlayer'
+import { getAvatar, sendMessage } from '../services/api'
 import {
   Download, Share2, Send, Globe, Clock, FileText, Copy, Check,
-  Shield, Lock, KeyRound, Loader2, CheckCircle2, XCircle, Smartphone
+  Loader2, CheckCircle2, XCircle, Smartphone
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const qualityOptions = [
   { id: '240p', label: '240p', desc: 'Low bandwidth / WhatsApp', size: '~2 MB' },
@@ -14,26 +15,72 @@ const qualityOptions = [
 ]
 
 export default function AvatarPreview() {
+  const navigate = useNavigate()
   const { id } = useParams()
   const [copied, setCopied] = useState(false)
   const [quality, setQuality] = useState('240p')
+  const [avatar, setAvatar] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [publishStatus, setPublishStatus] = useState(null) // { success: bool, message: str }
 
-  // Consent state
-  const [consentStep, setConsentStep] = useState('idle') // idle | requesting | otp | verifying | approved | rejected
+  // Consent state (Default to approved as per user request to bypass gate)
+  const [consentStep, setConsentStep] = useState('approved') // approved
   const [otp, setOtp] = useState('')
 
-  const mockData = {
-    id: id || 'demo',
-    title: 'PM Kisan Scheme Registration Open',
-    originalText: 'PM Kisan scheme registration is now open. All eligible farmers can register through the government portal or their nearest CSC center.',
-    translatedText: 'पीएम किसान योजना पंजीकरण अब खुला है। सभी पात्र किसान सरकारी पोर्टल या अपने निकटतम सीएससी केंद्र के माध्यम से पंजीकरण कर सकते हैं।',
-    language: 'Hindi',
-    languageCode: 'hi',
-    createdAt: new Date().toLocaleString(),
-    videoUrl: null,
-  }
+  const leaderId = localStorage.getItem('leaderId') || 'admin'
 
-  const shareUrl = `${window.location.origin}/view/${mockData.id}`
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      // Real generated content — read the leader's actual message
+      if (id === 'generated') {
+        const userMessage = localStorage.getItem('generatedMessage') || ''
+        const lang = localStorage.getItem('generatedLanguage') || 'hi'
+        const langLabel = localStorage.getItem('generatedLanguageLabel') || 'Hindi'
+
+        setAvatar({
+          id: 'generated',
+          original_text: userMessage,
+          translated_text: userMessage, // In production, this would be the BHASHINI translation
+          language: langLabel,
+          languageCode: lang,
+          video_url: null,
+          created_at: new Date().toLocaleString(),
+          consent_status: 'approved'
+        })
+        setLoading(false)
+        return
+      }
+
+      // Legacy demo route (fallback)
+      if (id === 'demo') {
+        setAvatar({
+          id: 'demo',
+          original_text: 'PM Kisan scheme registration is now open. All eligible farmers can register through the government portal or their nearest CSC center.',
+          translated_text: 'पीएम किसान योजना पंजीकरण अब खुला है। सभी पात्र किसान सरकारी पोर्टल या अपने निकटतम सीएससी केंद्र के माध्यम से पंजीकरण कर सकते हैं।',
+          language: 'Hindi',
+          languageCode: 'hi',
+          video_url: null,
+          created_at: new Date().toLocaleString(),
+          consent_status: 'demo'
+        })
+        setLoading(false)
+        return
+      }
+
+      try {
+        const { data } = await getAvatar(id)
+        setAvatar(data)
+      } catch (err) {
+        console.error("Failed to fetch avatar:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAvatar()
+  }, [id])
+
+  const shareUrl = `${window.location.origin}/view/${avatar?.id || id}`
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl)
@@ -41,20 +88,42 @@ export default function AvatarPreview() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleRequestOTP = async () => {
-    setConsentStep('requesting')
-    await new Promise(r => setTimeout(r, 1500))
-    setConsentStep('otp')
-  }
-
-  const handleVerifyOTP = async () => {
-    setConsentStep('verifying')
-    await new Promise(r => setTimeout(r, 1500))
-    setConsentStep(otp === '123456' || otp.length === 6 ? 'approved' : 'rejected')
-  }
 
   const handleWhatsAppShare = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(`Watch this government announcement: ${shareUrl}`)}`, '_blank')
+  }
+
+  const handlePublish = async () => {
+    setIsPublishing(true)
+    setPublishStatus(null)
+    try {
+      const res = await sendMessage({
+        leader_id: leaderId,
+        message: avatar?.original_text || '',
+        translated_text: avatar?.translated_text || '',
+        language: avatar?.language || 'hi'
+      })
+      setPublishStatus({ 
+        success: true, 
+        message: `Successfully broadcasted! Sent: ${res.data.sent}, Failed: ${res.data.failed}` 
+      })
+    } catch (err) {
+      console.error("Publish failed:", err)
+      setPublishStatus({ 
+        success: false, 
+        message: err.response?.data?.detail || "Broadcast failed. Please check your contact list." 
+      })
+    } finally {
+      setIsPublishing(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-subtle flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+      </div>
+    )
   }
 
   return (
@@ -74,16 +143,28 @@ export default function AvatarPreview() {
             <button onClick={handleWhatsAppShare} className="px-4 py-2.5 rounded-xl bg-emerald-500 text-white font-medium text-sm flex items-center gap-2 hover:bg-emerald-600 transition-all btn-press shadow-lg shadow-emerald-500/20">
               <Share2 className="w-4 h-4" /> WhatsApp
             </button>
-            <button disabled={consentStep !== 'approved'} className="px-4 py-2.5 rounded-xl gradient-primary text-white font-medium text-sm flex items-center gap-2 hover:shadow-lg transition-all btn-press disabled:opacity-50">
-              <Send className="w-4 h-4" /> Publish
+            <button 
+              onClick={handlePublish}
+              disabled={isPublishing} 
+              className="px-4 py-2.5 rounded-xl gradient-primary text-white font-medium text-sm flex items-center gap-2 hover:shadow-lg transition-all btn-press disabled:opacity-50"
+            >
+              {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              Publish
             </button>
           </div>
         </div>
 
+        {publishStatus && (
+          <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 animate-fade-in ${publishStatus.success ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+            {publishStatus.success ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+            <p className="text-sm font-semibold">{publishStatus.message}</p>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Video Player */}
           <div className="lg:col-span-3 space-y-4">
-            <AvatarPlayer videoUrl={mockData.videoUrl} title={mockData.title} />
+            <AvatarPlayer videoUrl={avatar?.video_url} title={avatar?.original_text} />
 
             {/* Quality selector */}
             <div className="glass-card rounded-2xl p-4">
@@ -130,68 +211,6 @@ export default function AvatarPreview() {
 
           {/* Right panel */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Security Approval */}
-            <div className="glass-card rounded-2xl p-5 border-2 border-blue-100/50">
-              <h3 className="font-heading font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                <Shield className="w-5 h-5 text-blue-500" />
-                Security Approval
-              </h3>
-
-              {consentStep === 'idle' && (
-                <button onClick={handleRequestOTP} className="w-full py-3 rounded-xl gradient-primary text-white font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all btn-press">
-                  <Lock className="w-4 h-4" /> Request OTP Approval
-                </button>
-              )}
-              {consentStep === 'requesting' && (
-                <div className="flex items-center justify-center gap-2 py-3 text-sm text-gray-500">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" /> Sending OTP...
-                </div>
-              )}
-              {consentStep === 'otp' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600">Enter the 6-digit OTP sent to your registered number.</p>
-                  <input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="• • • • • •"
-                    className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 glass-card rounded-xl border border-gray-200/50 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-                    maxLength={6}
-                  />
-                  <button onClick={handleVerifyOTP} disabled={otp.length < 6} className="w-full py-3 rounded-xl gradient-primary text-white font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all btn-press disabled:opacity-50">
-                    <KeyRound className="w-4 h-4" /> Verify & Publish
-                  </button>
-                </div>
-              )}
-              {consentStep === 'verifying' && (
-                <div className="flex items-center justify-center gap-2 py-3 text-sm text-gray-500">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" /> Verifying...
-                </div>
-              )}
-              {consentStep === 'approved' && (
-                <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-emerald-50/80 animate-scale-in">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                  <div>
-                    <p className="text-sm font-semibold text-emerald-700">Approved</p>
-                    <p className="text-xs text-emerald-600">Message verified and ready to publish</p>
-                  </div>
-                </div>
-              )}
-              {consentStep === 'rejected' && (
-                <div className="space-y-3 animate-scale-in">
-                  <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-red-50/80">
-                    <XCircle className="w-6 h-6 text-red-500" />
-                    <div>
-                      <p className="text-sm font-semibold text-red-700">Rejected</p>
-                      <p className="text-xs text-red-600">Invalid OTP. Try again.</p>
-                    </div>
-                  </div>
-                  <button onClick={() => { setConsentStep('otp'); setOtp('') }} className="w-full py-2.5 rounded-xl glass-card text-sm font-medium text-gray-600 hover:bg-white/80 btn-press">
-                    Retry
-                  </button>
-                </div>
-              )}
-            </div>
 
             {/* Details */}
             <div className="glass-card rounded-2xl p-5">
@@ -202,8 +221,8 @@ export default function AvatarPreview() {
                   <div>
                     <p className="text-xs text-gray-400">Language</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-sm font-medium text-gray-800">{mockData.language}</p>
-                      <span className="badge-lang text-[10px] font-bold px-2 py-0.5 rounded-full">{mockData.languageCode.toUpperCase()}</span>
+                      <p className="text-sm font-medium text-gray-800">{avatar?.language || 'Hindi'}</p>
+                      <span className="badge-lang text-[10px] font-bold px-2 py-0.5 rounded-full">{(avatar?.languageCode || 'hi').toUpperCase()}</span>
                     </div>
                   </div>
                 </div>
@@ -211,7 +230,7 @@ export default function AvatarPreview() {
                   <Clock className="w-4 h-4 text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-xs text-gray-400">Created</p>
-                    <p className="text-sm font-medium text-gray-800">{mockData.createdAt}</p>
+                    <p className="text-sm font-medium text-gray-800">{avatar?.created_at}</p>
                   </div>
                 </div>
               </div>
@@ -222,14 +241,14 @@ export default function AvatarPreview() {
               <h3 className="font-heading font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-gray-400" /> Original
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed bg-gray-50/50 rounded-xl p-3.5 border border-gray-100/50">{mockData.originalText}</p>
+              <p className="text-sm text-gray-600 leading-relaxed bg-gray-50/50 rounded-xl p-3.5 border border-gray-100/50">{avatar?.original_text}</p>
             </div>
 
             <div className="glass-card rounded-2xl p-5">
               <h3 className="font-heading font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-saffron-400" /> {mockData.language}
+                <FileText className="w-4 h-4 text-saffron-400" /> {avatar?.language || 'Hindi'}
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-saffron-50/30 to-orange-50/20 rounded-xl p-3.5 border border-saffron-100/50">{mockData.translatedText}</p>
+              <p className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-saffron-50/30 to-orange-50/20 rounded-xl p-3.5 border border-saffron-100/50">{avatar?.translated_text}</p>
             </div>
           </div>
         </div>
