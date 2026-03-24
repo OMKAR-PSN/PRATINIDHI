@@ -1,0 +1,104 @@
+import axios from 'axios'
+
+const API = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+export const uploadImage = async (formData) => {
+  return API.post('/upload/image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const generateAvatar = async (data) => {
+  return API.post('/avatar/generate', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const getAvatar = async (id) => {
+  return API.get(`/avatar/${id}`)
+}
+
+export const getMessages = async () => {
+  return API.get('/messages')
+}
+
+export const getAnalytics = async () => {
+  return API.get('/analytics')
+}
+
+// ==================== Auth ====================
+export const signUp = async (data) => {
+  return API.post('/auth/signup', data)
+}
+
+export const signIn = async (data) => {
+  return API.post('/auth/login', data)
+}
+
+// ==================== Consent — Biometric ====================
+export const verifyBiometric = async (leaderId) => {
+  return API.post(`/consent/biometric-verify?leader_id=${leaderId}`)
+}
+
+export const checkConsent = async (leaderId) => {
+  return API.get(`/consent/check/${leaderId}`)
+}
+
+// ==================== Consent — Security PIN ====================
+export const verifyPin = async (leaderId, securityPin) => {
+  return API.post('/consent/verify-pin', { leader_id: leaderId, security_pin: securityPin })
+}
+
+// ==================== Consent — Phone OTP ====================
+export const sendPhoneOTP = async (leaderId, phone) => {
+  return API.post(`/consent/send-otp?leader_id=${leaderId}&phone=${encodeURIComponent(phone)}`)
+}
+
+export const verifyPhoneOTP = async (leaderId, otp) => {
+  return API.post(`/consent/verify-otp?leader_id=${leaderId}&otp=${otp}`)
+}
+
+// ==================== Consent — Email OTP ====================
+export const sendEmailOTP = async (leaderId, email) => {
+  return API.post(`/consent/send-email-otp?leader_id=${leaderId}&email=${encodeURIComponent(email)}`)
+}
+
+export const verifyEmailOTP = async (leaderId, otp) => {
+  return API.post(`/consent/verify-email-otp?leader_id=${leaderId}&otp=${otp}`)
+}
+
+// ==================== Private Receivers ====================
+export const getReceivers = async (leaderId) => {
+  return API.get(`/receivers?leader_id=${leaderId}`)
+}
+
+export const addReceiver = async (data) => {
+  return API.post('/receivers', data)
+}
+
+export const sendMessage = async (data) => {
+  return API.post('/messages/send', data)
+}
+
+export const getMessageHistory = async (leaderId) => {
+  return API.get(`/messages/history?leader_id=${leaderId}`)
+}
+
+export const markAsRead = async (msgId, leaderId) => {
+  return API.post(`/messages/read/${msgId}?leader_id=${leaderId}`)
+}
+
+export const uploadReceivers = async (leaderId, file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return API.post(`/receivers/upload?leader_id=${leaderId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+export default API

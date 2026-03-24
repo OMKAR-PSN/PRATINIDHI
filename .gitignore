@@ -1,0 +1,27 @@
+# Code Dependencies & Virtual Envs
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+node_modules/
+build/
+dist/
+
+# Databases
+*.db
+*.db-journal
+*.sqlite3
+
+# Environment Variables
+.env
+
+# Project specific ignore files
+Wav2Lip/
+temp_pratinidhi_merge/
+*.txt
+!requirements.txt
+cd
+uploads/
+outputs/
+avatar_photos/

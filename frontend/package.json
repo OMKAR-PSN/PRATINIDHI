@@ -1,0 +1,43 @@
+{
+  "name": "bharat-avatar-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "proxy": "http://localhost:8000",
+  "description": "भारत Avatar Platform — AI-powered governance avatar system",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "chart.js": "^4.4.1",
+    "lucide-react": "^0.577.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1",
+    "react-scripts": "5.0.1",
+    "react-webcam": "^7.2.0",
+    "recharts": "^3.8.0",
+    "web-vitals": "^3.5.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
