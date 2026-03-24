@@ -21,7 +21,8 @@ Wav2Lip/
 temp_pratinidhi_merge/
 *.txt
 !requirements.txt
+!avatarapi/knowledge_base/**/*.txt
+!avatarapi/knowledge_base/*.txt
 cd
 uploads/
 outputs/
-avatar_photos/

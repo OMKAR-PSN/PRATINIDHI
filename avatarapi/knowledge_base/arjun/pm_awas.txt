@@ -1,0 +1,136 @@
+PRADHAN MANTRI AWAS YOJANA (PMAY) - THE COMPLETE KNOWLEDGE BASE (2026 EDITION)
+
+1. MISSION OVERVIEW AND CORE PHILOSOPHY
+The Pradhan Mantri Awas Yojana (PMAY) is India’s flagship housing mission.
+Its primary objective is "Housing for All," ensuring every citizen has a pucca house.
+A pucca house is defined as an all-weather dwelling unit with basic amenities.
+Basic amenities include a hygienic kitchen, a toilet, and access to electricity and water.
+The mission operates through two distinct sub-schemes: PMAY-Gramin and PMAY-Urban.
+The mission has transitioned into Phase 2.0 (2024-2029) to cover additional demand.
+Total investment for PMAY-Urban 2.0 alone is estimated at Rs 10 lakh crore.
+The central government provides financial assistance to states and UTs for implementation.
+The scheme promotes women's empowerment by requiring female ownership or co-ownership.
+
+2. PRADHAN MANTRI AWAS YOJANA - GRAMIN (PMAY-G) PHASE 2.0
+PMAY-G Phase 2.0 covers the period from April 2024 to March 2029.
+The target for this phase is to construct an additional 2 crore rural houses.
+This is in addition to the original 2.95 crore houses targeted in Phase 1.0.
+By early 2026, the cumulative target stands at approximately 4.95 crore houses.
+
+2.1 FINANCIAL ASSISTANCE AND CONVERGENCE (GRAMIN)
+Unit assistance for construction in plain areas: Rs 1,20,000.
+Unit assistance for construction in hilly, difficult, or IAP districts: Rs 1,30,000.
+Hilly areas include Himalayan states, Northeastern states, and the UT of J&K.
+Difficult areas include LWE-affected (Left Wing Extremism) and tribal districts.
+Additional support for toilet construction: Rs 12,000 via Swachh Bharat Mission (SBM-G).
+Labor support via MGNREGA: 90-95 days of unskilled labor wages (approx. Rs 18,000 - 27,000).
+Convergence with PM-Ujjwala Yojana: Provides free LPG connections to beneficiaries.
+Convergence with Saubhagya: Provides free electricity connections to the house.
+Convergence with Jal Jeevan Mission: Ensures functional household tap connections (FHTC).
+Beneficiaries can opt for an institutional loan up to Rs 70,000 at a 3% lower interest rate.
+
+2.2 ELIGIBILITY AND SELECTION (AWAAS+)
+Selection is based on the Socio-Economic Caste Census (SECC) 2011 and Awaas+ 2024 surveys.
+Primary priority: Households without shelter and those living in 0, 1, or 2 room kutcha houses.
+New 2026 Income Limit: Monthly household income up to Rs 15,000 (increased from Rs 10,000).
+Relaxation: Owning a motorized two-wheeler (bike/scooter) no longer disqualifies a family.
+Relaxation: Owning a refrigerator is no longer an automatic exclusion criterion.
+Automatic Exclusion Parameters (The "Exclusion 10"):
+- Families owning a motorized 3-wheeler or 4-wheeler (cars, tractors).
+- Families owning a mechanized fishing boat.
+- Families with any member as a regular Government employee.
+- Households with non-agricultural enterprises registered with the government.
+- Any family member paying Income Tax or Professional Tax.
+- Families owning 2.5 acres or more of irrigated land with irrigation equipment.
+- Families owning 5 acres or more of land for two or more crop seasons.
+
+2.3 THE THREE-STAGE VALIDATION PROCESS
+Stage 1: Automatic identification from SECC 2011 and Awaas+ digital databases.
+Stage 2: Validation by the Gram Sabha to verify the authenticity of the claim.
+Stage 3: Geo-tagging of the existing kutcha house to prevent fraudulent applications.
+The final Permanent Wait List (PWL) is made public at the Panchayat level.
+
+3. PRADHAN MANTRI AWAS YOJANA - URBAN 2.0 (PMAY-U 2.0)
+PMAY-U 2.0 was officially launched in September 2024 for a 5-year duration.
+It targets the construction, purchase, or rental of 1 crore houses for urban families.
+The central assistance provided for this phase is approximately Rs 2.30 lakh crore.
+
+3.1 INCOME CATEGORIZATION FOR URBAN 2.0
+Economically Weaker Section (EWS): Annual household income up to Rs 3 Lakh.
+Low Income Group (LIG): Annual household income between Rs 3 Lakh and Rs 6 Lakh.
+Middle Income Group (MIG): Annual household income between Rs 6 Lakh and Rs 9 Lakh.
+Income is calculated as the total annual income of all earning members in the family.
+
+3.2 THE FOUR VERTICALS OF PMAY-URBAN 2.0
+Vertical 1: Beneficiary Led Construction (BLC)
+- Focuses on EWS families who own their own land but have a kutcha/dilapidated house.
+- Central assistance: Rs 2.5 lakh per unit.
+- Carpet area: Minimum 30 sqm; States can extend this up to 45 sqm.
+- If the beneficiary is landless, States/UTs may provide "pattas" (land rights).
+
+Vertical 2: Affordable Housing in Partnership (AHP)
+- Projects where 35% of houses are reserved for the EWS category.
+- Developed by Public or Private agencies in partnership with State Governments.
+- Central assistance: Rs 2.5 lakh per EWS house.
+- Provides "Redeemable Housing Vouchers" to beneficiaries buying from whitelisted projects.
+
+Vertical 3: Interest Subsidy Scheme (ISS)
+- A credit-linked subsidy for EWS, LIG, and MIG families.
+- Eligibility: Home loan up to Rs 25 Lakh; Property value up to Rs 35 Lakh.
+- Benefit: 4% interest subsidy on the first Rs 8 Lakh of the loan.
+- Maximum total benefit: Rs 1.80 Lakh.
+- Subsidy is released in 5-yearly installments via Direct Benefit Transfer (DBT).
+- The loan tenure must be at least 5 years to qualify.
+- Maximum carpet area allowed: 120 square meters.
+
+Vertical 4: Affordable Rental Housing (ARH)
+- Model 1: Converting existing government-funded vacant houses into rental units.
+- Model 2: Private/Public agencies construct and operate rental complexes on their own land.
+- Focus: Urban migrants, street vendors, industrial workers, and working women.
+- Rental houses are provided with basic social infrastructure.
+
+4. TECHNOLOGY AND MONITORING SYSTEMS
+The mission emphasizes modern, green, and disaster-resilient construction.
+Technology Innovation Grant (TIG): Additional grant for using innovative technologies.
+TIG for ARH: Rs 3,000 per sqm from Central and Rs 2,000 per sqm from State.
+Technology Sub-Mission (TISM): Facilitates the adoption of "Light House Projects."
+Monitoring Portal (AwaasSoft): A comprehensive MIS for tracking every house.
+Mobile App (AwaasApp/PMAY-U App): Used for inspection and geo-tagging.
+Geo-tagging occurs at 5 stages: Foundation, Plinth, Lintel, Roof, and Completion.
+Social Audit: Mandatory annual audit by the community to ensure transparency.
+Direct Benefit Transfer (DBT): Funds are sent directly to the beneficiary's Aadhaar-linked bank account.
+Aadhaar Payment Bridge System (APBS) ensures no middleman interference.
+
+5. SPECIAL PROVISIONS AND SOCIAL INCLUSIVITY
+Priority is given to Scheduled Castes (SC) and Scheduled Tribes (ST).
+60% of rural targets are reserved for SC/ST categories.
+Priority for Particularly Vulnerable Tribal Groups (PVTGs) under PM-JANMAN.
+Preference for Widows, Single Women, and Persons with Disabilities (Divyangjan).
+Transgender persons and Senior Citizens are included in the priority list.
+Special focus on Safai Karmis, Street Vendors (PM-SVANidhi), and Artisans (PM-Vishwakarma).
+Internal Grievance Redressal: Beneficiaries can register complaints via the PMAY portal or 1800-11-6446.
+
+6. STEPS TO APPLY FOR PMAY-URBAN 2.0 (CITIZEN GUIDE)
+Step 1: Verify eligibility based on annual household income and pucca house ownership.
+Step 2: Visit the official portal pmaymis.gov.in.
+Step 3: Click on 'Citizen Assessment' and enter Aadhaar/Virtual ID.
+Step 4: Fill the application form with personal, bank, and income details.
+Step 5: Upload mandatory documents: Identity proof, Income proof, and Property papers.
+Step 6: Submit the form and note the Application ID for future tracking.
+Step 7: Physical verification will be conducted by the Urban Local Body (ULB).
+
+7. KEY COMPARISONS: PMAY 1.0 VS. PMAY 2.0
+- Goal: PMAY 1.0 aimed for 3 crore houses; PMAY 2.0 aims for 3 crore more (2cr rural + 1cr urban).
+- Income: Urban income limit for MIG was previously higher; 2.0 streamlines it to Rs 9 Lakh.
+- Technology: 2.0 has a much larger focus on "Green Construction" and TIG grants.
+- Subsidy: ISS in 2.0 offers up to Rs 1.8L, structured as a 5-year installment benefit.
+- Duration: PMAY 2.0 is the definitive mission for the "Viksit Bharat 2047" vision.
+
+8. CONTACT AND HELPLINE INFORMATION
+National PMAY-G Helpline: 1800-11-6446
+National PMAY-U Helpline: 1800-11-3377 / 1800-11-3388
+Official PMAY-G Website: pmayg.nic.in
+Official PMAY-U Website: pmaymis.gov.in
+Ministry of Rural Development: rural.nic.in
+Ministry of Housing and Urban Affairs: mohua.gov.in
+Email Support: support-pmayg@gov.in / enquiry-pmayurb@gov.in

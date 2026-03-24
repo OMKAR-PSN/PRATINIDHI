@@ -1,0 +1,136 @@
+AYUSHMAN BHARAT - PRADHAN MANTRI JAN AROGYA YOJANA (PM-JAY) KNOWLEDGE BASE 2026
+
+1. MISSION SCOPE AND CORE OBJECTIVES
+Ayushman Bharat PM-JAY is the world’s largest government-funded health assurance scheme.
+It was launched to achieve the vision of Universal Health Coverage (UHC).
+The scheme is designed to provide financial protection against catastrophic health expenses.
+It provides a health cover of Rs. 5 Lakh per family per year.
+The cover is applicable for secondary and tertiary care hospitalization.
+PM-JAY is a completely cashless and paperless service at the point of care.
+The scheme covers over 12 crore poor and vulnerable families (approx. 55 crore individuals).
+As of 2026, it is integrated with the Ayushman Bharat Digital Mission (ABDM).
+
+2. DETAILED ELIGIBILITY CRITERIA (Socio-Economic Categories)
+Eligibility is primarily based on the Socio-Economic Caste Census (SECC) 2011 data.
+Rural Categories Eligible:
+- D1: Only one room with kucha walls and kucha roof.
+- D2: No adult member between ages 16 to 59.
+- D3: Female-headed households with no adult male member between 16 to 59.
+- D4: Households with a disabled member and no able-bodied adult member.
+- D5: SC/ST households.
+- D7: Landless households deriving a major part of their income from manual casual labor.
+Urban Categories Eligible (Based on Occupational Hazards):
+- Beggars and those living on alms.
+- Domestic workers and Ragpickers.
+- Street vendors, cobblers, and hawkers.
+- Construction workers, plumbers, masons, and painters.
+- Sweepers, sanitation workers, and mali (gardeners).
+- Transport workers (drivers, conductors, helpers), cart pullers, and rickshaw pullers.
+- Shop workers, peons in small establishments, and delivery assistants.
+- Waiters, washermen, and mechanics.
+
+3. SPECIAL EXPANSION: SENIOR CITIZENS (70+ YEARS)
+In late 2024, the Union Cabinet expanded PM-JAY to all citizens aged 70 and above.
+This expansion is income-agnostic (available to rich and poor alike).
+Senior citizens (70+) belonging to families already covered under PM-JAY get an additional 
+top-up cover of Rs. 5 Lakh per year (shared only with other 70+ members in the family).
+Senior citizens (70+) not covered under PM-JAY get a standalone cover of Rs. 5 Lakh per year.
+Seniors already covered under private insurance or ESIC are also eligible.
+Seniors covered under CGHS or Ex-Servicemen Contributory Health Scheme (ECHS) can choose 
+between their existing scheme or PM-JAY.
+
+4. HEALTH BENEFIT PACKAGES (HBP 2026)
+The scheme covers 1,961 medical procedures across 27 specialties.
+Specialties include:
+- Cardiology and Cardio-thoracic Surgery (e.g., Pacemaker, PTCA, CABG).
+- Oncology (Medical, Surgical, and Radiation therapy for all types of cancer).
+- Nephrology (e.g., Dialysis, Kidney transplant assistance).
+- Orthopaedics (e.g., Knee/Hip replacement, complex fracture management).
+- Neurosurgery (e.g., Brain tumor excision, spinal surgeries).
+- Paediatric Surgery and Neonatal Care.
+- Ophthalmology (Cataract surgery, Vitreo-retinal surgery).
+Pre-hospitalization: Covers diagnostics and medicines for 3 days prior to admission.
+Post-hospitalization: Covers medicines and consultation for 15 days after discharge.
+Room charges, nursing, food, and OT/ICU charges are included in the package rates.
+
+5. HOSPITAL EMPANELMENT AND PORTABILITY
+Total empanelled hospitals exceed 36,000 across India.
+The network includes both Public (Government) and Private providers.
+National Portability: A beneficiary from one state can receive treatment in any other state.
+Hospitals must meet Quality Council of India (QCI) standards for empanelment.
+Tier-1, Tier-2, and Tier-3 cities are covered to ensure rural-to-urban access.
+
+6. THE AYUSHMAN CARD AND DIGITAL INFRASTRUCTURE
+The Ayushman Card (e-card) is the primary identity document for the scheme.
+Cards are generated using Aadhaar-based e-KYC (Face-Auth or OTP).
+The Ayushman App allows for self-registration and card downloads.
+ABHA (Ayushman Bharat Health Account): A 14-digit number to link digital health records.
+ABHA allows beneficiaries to share lab reports and prescriptions with doctors digitally.
+The BIS (Beneficiary Identification System) manages the verification of eligible members.
+TMS (Transaction Management System) handles the processing of hospital claims.
+
+7. EXCLUSION CRITERIA (For standard categories, not 70+):
+- Households owning a motorized 2/3/4-wheeler or a fishing boat.
+- Households with a Kisan Credit Card (KCC) limit above Rs. 50,000.
+- Households with any member as a government employee.
+- Households earning more than Rs. 10,000 per month (as per original SECC).
+- Households paying Income Tax or Professional Tax.
+- Households owning 2.5 acres of irrigated land with irrigation equipment.
+
+8. GOVERNANCE AND GRIEVANCE REDRESSAL
+National Health Authority (NHA) is the apex body for implementation.
+State Health Agencies (SHA) manage operations at the state level.
+Ayushman Mitra: Dedicated help-desk personnel at every empanelled hospital.
+National Helpline: 14555 or 1800-111-565.
+Grievance Portal: CGRMS (Central Grievance Redressal Management System).
+
+---
+
+9. MAHILA SAMMAN BACHAT PATRA (MSBP)
+Type: One-time small savings scheme for women and girls.
+Tenure: 2 years (Fixed).
+Interest Rate: 7.5% per annum (Compounded quarterly).
+Minimum Deposit: Rs. 1,000.
+Maximum Deposit: Rs. 2,00,000 per account holder.
+Withdrawal: 40% of the balance can be withdrawn after 1 year.
+Account Closure: Can be closed prematurely in case of death or extreme medical grounds.
+Accessibility: Available at all Post Offices and scheduled commercial banks.
+
+10. MAHARASHTRA MAJHI LADKI BAHIN YOJANA
+Purpose: To provide financial independence and health nutrition to women in Maharashtra.
+Financial Benefit: Rs. 1,500 per month (Direct Benefit Transfer).
+Age Limit: 21 to 65 years.
+Income Limit: Combined family income must be less than Rs. 2.5 Lakh per annum.
+Mandatory Documents:
+- Aadhaar Card.
+- Maharashtra Domicile Certificate or Ration Card (Orange/Yellow).
+- Bank Passbook (Aadhaar seeded).
+- Self-declaration form.
+Exclusions: Families with a permanent government employee or an Income Tax payer.
+Application Portal: Nari Shakti Doot App or local Setu Suvidha Kendra.
+
+11. SWACHH BARET MISSION (SBM)
+Objective: Achieving Open Defecation Free (ODF) Plus status for all villages and cities.
+SBM-Gramin: Focus on rural sanitation.
+SBM-Urban: Focus on garbage-free cities and scientific waste processing.
+Individual Household Latrine (IHHL) Incentive: Rs. 12,000 for BPL/Identified APL families.
+ODF Plus Categories:
+- ODF Plus Aspiring: Villages with functional toilets and basic waste management.
+- ODF Plus Rising: Villages with advanced liquid/solid waste management.
+- ODF Plus Model: Villages with complete sustainability and visual cleanliness.
+Gobar-Dhan Scheme: Converting cattle dung and organic waste into Biogas and Bio-CNG.
+
+12. PM KISAN SAMMAN NIDHI
+Benefit: Rs. 6,000 per year provided in three equal installments of Rs. 2,000.
+Installment Periods: April-July, August-November, and December-March.
+Eligibility: All landholding farmer families (subject to exclusion rules).
+Exclusions: Institutional landholders, former/present constitutional post holders, 
+retired employees with a pension of Rs. 10,000 or more, and professionals (Doctors, Engineers).
+Mandatory: e-KYC and Aadhaar seeding are required for receiving payments.
+Portal: pmkisan.gov.in for self-registration and beneficiary status tracking.
+
+13. PM AWAS YOJANA (PMAY) - SUMMARY DATA
+PMAY-Gramin: Rs. 1.2 Lakh (Plains) / Rs. 1.3 Lakh (Hilly) for house construction.
+PMAY-Urban 2.0: 1 crore houses targeted for urban poor and middle class.
+Interest Subsidy: 4% interest subvention for home loans up to Rs. 8 Lakh for EWS/LIG.
+Convergence: Includes SBM (Toilet), Saubhagya (Electricity), and Ujjwala (LPG).

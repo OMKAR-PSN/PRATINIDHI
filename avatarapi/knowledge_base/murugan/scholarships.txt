@@ -1,0 +1,138 @@
+NATIONAL SCHOLARSHIP PORTAL (NSP) & EDUCATIONAL WELFARE - KNOWLEDGE BASE 2026
+
+1. NATIONAL SCHOLARSHIP PORTAL (NSP) - MISSION AND ARCHITECTURE
+The National Scholarship Portal (NSP) is a digital mission mode project under NeGP.
+It provides a common electronic portal for implementing various scholarship schemes.
+The portal is hosted at the official URL: scholarships.gov.in.
+It aims to provide a simplified, mission-oriented, and transparent system for students.
+NSP ensures "Direct Benefit Transfer" (DBT) of funds into the students' bank accounts.
+It eliminates leakage and duplication of applications through Aadhaar integration.
+The portal supports schemes from Central Ministries, State Governments, and UTs.
+As of 2026, NSP has implemented a "One-Time Registration" (OTR) system.
+OTR provides a unique 14-digit permanent ID to students for their entire academic life.
+Aadhaar Face Authentication is now mandatory for OTR for all students above 5 years.
+
+2. SCHOLARSHIP CATEGORIES AND SCHEMES ON NSP
+2.1 Pre-Matric Scholarship Schemes:
+- Target Group: Students studying from Class 1 to Class 10.
+- Ministries: Ministry of Minority Affairs (MoMA), Social Justice (MoSJE), Tribal Affairs.
+- General Eligibility: Family income must not exceed Rs. 2.5 Lakh per annum.
+- Scholarship Amount: Ranges from Rs. 3,500 to Rs. 7,000 per annum.
+- Focus: Reducing the drop-out rate in primary and secondary education levels.
+- SC/ST/OBC and Minority communities are primary beneficiaries.
+
+2.2 Post-Matric Scholarship Schemes:
+- Target Group: Students in Class 11, Class 12, ITI, Diploma, and Higher Education.
+- Includes Graduate, Post-Graduate, and Ph.D. level students.
+- Income Limit (SC/ST): Rs. 2.5 Lakh per annum.
+- Income Limit (OBC/EBC): Rs. 1 Lakh to Rs. 1.5 Lakh depending on the state.
+- Benefits: Covers compulsory non-refundable fees and maintenance allowance.
+- Maintenance allowance for hostellers is higher than for day scholars.
+
+2.3 Merit-cum-Means (MCM) Scholarship:
+- Specifically for professional and technical courses (Engineering, Medical, Law).
+- Target: Minority communities and economically weaker sections.
+- Eligibility: 50% marks in the previous final examination.
+- Annual Income Limit: Rs. 2.5 Lakh.
+- Benefit: Full tuition fee reimbursement (capped) and maintenance allowance.
+
+2.4 PM-YASASVI (Young Achievers Scholarship Award Scheme for Vibrant India):
+- For OBC, EBC, and DNT students studying in Top Class Schools and Colleges.
+- Selection: Merit-based through the YASASVI Entrance Test or direct NSP application.
+- Scholarship: Up to Rs. 75,000 per year for Class 9-10; Rs. 1,25,000 for Class 11-12.
+
+3. STEP-BY-STEP NSP APPLICATION PROCESS (2026 UPDATE)
+Step 1: Obtain OTR (One-Time Registration) via the NSP mobile app or website.
+Step 2: Complete Aadhaar Face Authentication or OTP-based verification.
+Step 3: Log in using the OTR ID and the password sent to the registered mobile number.
+Step 4: Fill the Scholarship Application Form with academic and domicile details.
+Step 5: Select the specific scheme for which the student is eligible.
+Step 6: Upload Mandatory Documents:
+- Educational Marksheets (Previous Year).
+- Domicile Certificate issued by the competent state authority.
+- Income Certificate issued by Revenue Officer/Tahsildar.
+- Caste Certificate (SC/ST/OBC/Minority Status).
+- Bank Passbook (Aadhaar-seeded account is mandatory).
+- Bonafide Student Certificate from the Head of the Institute.
+Step 7: Final Submit and take a printout for institutional verification.
+Step 8: L1 Verification: Conducted by the Institute Nodal Officer (INO).
+Step 9: L2 Verification: Conducted by the District/State Nodal Officer (DNO/SNO).
+Step 10: Merit List Generation and Payment processing via PFMS (Public Financial Management System).
+
+4. PM POSHAN SHAKTI NIRMAN (MID-DAY MEAL SCHEME)
+PM Poshan is a Centrally Sponsored Scheme to improve the nutritional status of children.
+It covers all school children in Classes 1-8 in Government and Government-aided schools.
+It also covers children in Special Training Centres and Madrasas supported under Samagra Shiksha.
+The scheme has been extended to "Balvatika" (children below Class 1) as of 2024-25.
+
+4.1 Nutritional Standards (Per Child Per Day):
+Primary (Classes 1-5):
+- Calories: 450 kcal.
+- Protein: 12 grams.
+- Food Grains: 100 grams (Rice/Wheat).
+Upper Primary (Classes 6-8):
+- Calories: 700 kcal.
+- Protein: 20 grams.
+- Food Grains: 150 grams (Rice/Wheat).
+Iron, Folic Acid, and Vitamin A supplementation is provided in coordination with NHM.
+
+4.2 Key Features of PM Poshan 2.0:
+- Tithi Bhojan: Encouraging the community to provide special food on festivals/birthdays.
+- School Nutrition Gardens (SNG): Schools grow their own vegetables and fruits.
+- Social Audit: Mandatory audit in every district to ensure food quality and hygiene.
+- Cooking Cost: Central and State governments share the cost of pulses, oil, and fuel.
+- Honorarium: Cook-cum-helpers receive a monthly honorarium for their services.
+- Millets (Shree Anna): 2026 update mandates inclusion of millets at least once a week.
+- Tamil Nadu Special: Provides free breakfast for Classes 1-5 in all government schools.
+
+5. RIGHT TO EDUCATION (RTE) ACT, 2009
+The RTE Act makes education a Fundamental Right under Article 21-A of the Constitution.
+It provides free and compulsory education to all children aged 6 to 14 years.
+
+5.1 Section 12(1)(c) - Reservation in Private Schools:
+- Mandates 25% reservation in private unaided schools for EWS and disadvantaged groups.
+- Disadvantaged groups include SC, ST, Orphans, HIV-affected, and Disabled children.
+- The government reimburses the tuition fees to the private schools at per-child costs.
+- Admission is usually conducted through a centralized state-level lottery system.
+
+5.2 Key Provisions and Mandates:
+- No Detention Policy: No child can be held back or expelled until Class 8.
+- No Screening: Schools cannot conduct entrance tests for children or interviews for parents.
+- No Capitation Fee: Charging extra fees for admission is strictly prohibited and punishable.
+- Pupil-Teacher Ratio (PTR): 30:1 for Primary; 35:1 for Upper Primary.
+- Infrastructure: Mandates separate toilets for girls/boys, drinking water, and playgrounds.
+- Working Days: 200 days for Primary; 220 days for Upper Primary per academic year.
+
+6. PM SHRI SCHOOLS (SCHOOLS FOR RISING INDIA)
+PM SHRI is a centrally sponsored scheme to develop 14,500 "Exemplary Schools."
+These schools act as mentors to other schools in their respective clusters.
+They showcase the implementation of the National Education Policy (NEP) 2020.
+
+6.1 Core Pillars of PM SHRI Schools:
+- Pedagogy: Experiential, holistic, integrated, and learner-centered education.
+- Assessment: Competency-based assessment focusing on conceptual clarity.
+- Green Schools: Solar panels, LED lights, waste management, and water harvesting.
+- Infrastructure: STEM labs, smart classrooms, libraries, and vocational labs.
+- Modern Facilities: High-speed internet and digital pedagogy tools.
+- Selection: Schools apply through an online portal based on 60 defined parameters.
+- Funding: Direct funds are provided to schools to meet specific local learning needs.
+
+7. OTHER CRITICAL EDUCATIONAL SCHEMES
+7.1 National Means-cum-Merit Scholarship (NMMS):
+- For Class 8 students to prevent drop-outs before secondary school.
+- Exam: State-level Mental Ability Test (MAT) and Scholastic Aptitude Test (SAT).
+- Benefit: Rs. 12,000 per year from Class 9 to Class 12.
+
+7.2 INSPIRE Scholarship:
+- For top 1% students in Board Exams pursuing Basic and Natural Sciences.
+- Benefit: Rs. 80,000 per annum for B.Sc. and M.Sc. courses.
+
+7.3 PM-Vidyalaxmi:
+- A unified portal for students seeking Education Loans from various banks.
+- Links scholarship portals with loan portals for seamless financial planning.
+
+8. CONTACT AND SUPPORT FOR NSP
+Helpline Number: 0120-6619540
+Email Support: helpdesk@nsp.gov.in
+Grievance Redressal: Available via the "Public Grievance" link on scholarships.gov.in.
+Mobile App: "NSP - National Scholarship Portal" available on Google Play Store.

@@ -1,0 +1,46 @@
+PM Kisan Samman Nidhi Yojana - Complete Information
+
+PM Kisan Samman Nidhi is a Central Sector Scheme of Government of India.
+Under this scheme, income support of Rs 6000 per year is provided to all 
+farmer families across the country in three equal installments of Rs 2000 each.
+
+Eligibility:
+- All landholding farmer families with cultivable land
+- Family means husband, wife and minor children
+- Both institutional landholders and small and marginal farmers are eligible
+
+How to Register:
+- Visit nearest Common Service Centre (CSC)
+- Visit pmkisan.gov.in website
+- Contact local Patwari/Revenue Officer
+- Required documents: Aadhaar card, bank account, land records
+
+Payment Process:
+- Money transferred directly to bank account via DBT
+- Three installments: April-July, August-November, December-March
+- Amount: Rs 2000 per installment, Rs 6000 per year total
+
+eKYC is mandatory for receiving benefits.
+Farmers can check status at pmkisan.gov.in
+Helpline: 155261 or 1800115526
+
+Jan Dhan Yojana - How to open account:
+- Visit any bank branch or Business Correspondent
+- Fill account opening form
+- Submit Aadhaar card or other identity proof
+- No minimum balance required
+- Get free RuPay debit card
+- Overdraft facility up to Rs 10,000 after 6 months
+
+PM Awas Yojana Gramin:
+- Free pucca house for homeless and kutcha house residents
+- Rs 1,20,000 assistance in plains, Rs 1,30,000 in hilly areas
+- Apply through Gram Panchayat or online at pmayg.nic.in
+- Eligibility: BPL families, SC/ST, minorities, women
+
+Ration Card:
+- Apply at local PDS office or online at state portal
+- Required: Aadhaar, residence proof, family details
+- Entitlement: 5kg food grains per person per month at subsidized rate
+- Green card: BPL families, Yellow card: AAY (poorest) families
+```
