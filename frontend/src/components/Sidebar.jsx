@@ -4,16 +4,16 @@ import {
   LogOut, Globe, ChevronLeft, ChevronRight, HelpCircle, Shield, Users
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const allNavItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', roles: ['all'] },
-  { icon: UserPlus, label: 'Create Announcement', path: '/create', roles: ['all'] },
-  { icon: MessageSquare, label: 'Messages', path: '/messages', roles: ['all'], badge: true },
-  { icon: Users, label: 'My Receivers', path: '/receivers', roles: ['all'] },
-  { icon: HelpCircle, label: 'Ask Avatar', path: '/ask-avatar', roles: ['all'] },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics', roles: ['admin', 'mp', 'mla'] },
-  { icon: Shield, label: 'Compliance', path: '/settings', roles: ['admin'] },
-  { icon: Settings, label: 'Settings', path: '/settings', roles: ['all'] },
+  { icon: LayoutDashboard, labelKey: 'nav_dashboard', path: '/dashboard', roles: ['all'] },
+  { icon: UserPlus, labelKey: 'nav_create', path: '/create', roles: ['all'] },
+  { icon: MessageSquare, labelKey: 'msg_title', path: '/messages', roles: ['all'], badge: true },
+  { icon: Users, labelKey: 'nav_receivers', path: '/receivers', roles: ['all'] },
+  { icon: HelpCircle, labelKey: 'nav_ask', path: '/ask-avatar', roles: ['all'] },
+  { icon: BarChart3, labelKey: 'nav_analytics', path: '/analytics', roles: ['admin', 'mp', 'mla'] },
+  { icon: Settings, labelKey: 'nav_settings', path: '/settings', roles: ['all'] },
 ]
 
 const roleConfig = {
@@ -26,6 +26,7 @@ const roleConfig = {
 
 export default function Sidebar() {
   const location = useLocation()
+  const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const role = localStorage.getItem('userRole') || 'admin'
@@ -91,24 +92,25 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {navItems.map(({ icon: Icon, label, path }) => {
+        {navItems.map(({ icon: Icon, labelKey, path }) => {
           const isActive = location.pathname === path || (path !== '/settings' && location.pathname.startsWith(path + '/'))
+          const displayLabel = t(labelKey)
           return (
             <Link
-              key={path + label}
+              key={path}
               to={path}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group btn-press relative ${
                 isActive
                   ? 'gradient-primary text-white shadow-lg shadow-blue-500/20'
                   : 'text-gray-600 hover:bg-white/60 hover:text-blue-600'
               }`}
-              title={collapsed ? label : ''}
+              title={collapsed ? displayLabel : ''}
             >
               <Icon className={`w-5 h-5 min-w-[20px] transition-transform group-hover:scale-110 ${
                 isActive ? 'text-white' : 'text-gray-400 group-hover:text-blue-500'
               }`} />
-              {!collapsed && <span className="whitespace-nowrap flex-1">{label}</span>}
-              {label === 'Messages' && unreadCount > 0 && (
+              {!collapsed && <span className="whitespace-nowrap flex-1">{displayLabel}</span>}
+              {labelKey === 'msg_title' && unreadCount > 0 && (
                 <span className={`flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full bg-red-500 text-white border-2 border-white shadow-sm ${collapsed ? 'absolute top-1 right-1' : ''}`}>
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
@@ -136,10 +138,10 @@ export default function Sidebar() {
           to="/"
           onClick={() => localStorage.removeItem('userRole')}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50/80 hover:text-red-500 transition-all btn-press"
-          title={collapsed ? 'Logout' : ''}
+          title={collapsed ? t('nav_logout', 'Log Out') : ''}
         >
           <LogOut className="w-5 h-5 min-w-[20px]" />
-          {!collapsed && <span>Logout</span>}
+          {!collapsed && <span>{t('nav_logout', 'Log Out')}</span>}
         </Link>
       </div>
     </aside>

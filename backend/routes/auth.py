@@ -8,6 +8,22 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 from typing import Optional
 
+@router.get("/me")
+async def get_me(leader_id: str):
+    if leader_id == "admin":
+        return {
+            "id": "admin",
+            "email": "admin@gov.in",
+            "name": "Super Administrator",
+            "phone": "+919999999999",
+            "role": "admin",
+            "department": "Ministry of Communications"
+        }
+    user = db_execute("SELECT id, name, email, phone, role, face_image_url FROM leaders WHERE id = %s", (leader_id,), fetchone=True)
+    if not user:
+        raise HTTPException(404, "User not found")
+    return user
+
 class SignupRequest(BaseModel):
     name: str
     email: str

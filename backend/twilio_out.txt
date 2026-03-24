@@ -1,0 +1,10 @@
+Recent failed messages:
+To: whatsapp:+919970875815, Status: failed, Error Code: 63015, Error Message: None
+To: whatsapp:+918767149902, Status: failed, Error Code: 63019, Error Message: None
+To: whatsapp:+918600504551, Status: failed, Error Code: 63019, Error Message: None
+To: whatsapp:+919970875815, Status: failed, Error Code: 63015, Error Message: None
+To: whatsapp:+918767149902, Status: failed, Error Code: 63019, Error Message: None
+To: whatsapp:+918600504551, Status: failed, Error Code: 63019, Error Message: None
+To: whatsapp:+918888888888, Status: failed, Error Code: 63015, Error Message: None
+To: whatsapp:+919970875815, Status: failed, Error Code: 63015, Error Message: None
+Done checking.

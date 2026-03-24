@@ -17,7 +17,7 @@ TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 # Resend Config
 resend.api_key = os.getenv("RESEND_API_KEY")
 
-def send_whatsapp(to_phone: str, message: str) -> (bool, str):
+def send_whatsapp(to_phone: str, message: str, media_url: str = None) -> (bool, str):
     if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN:
         return False, "Twilio credentials missing"
         
@@ -33,11 +33,15 @@ def send_whatsapp(to_phone: str, message: str) -> (bool, str):
         elif not to_phone.startswith("+"):
             to_phone = "+" + clean_phone
             
-        msg = client.messages.create(
-            from_=TWILIO_WHATSAPP_NUMBER,
-            body=message,
-            to=f"whatsapp:{to_phone}"
-        )
+        kwargs = {
+            "from_": TWILIO_WHATSAPP_NUMBER,
+            "body": message,
+            "to": f"whatsapp:{to_phone}"
+        }
+        if media_url:
+            kwargs["media_url"] = [media_url]
+            
+        msg = client.messages.create(**kwargs)
         return True, f"SID: {msg.sid}"
     except Exception as e:
         return False, str(e)

@@ -34,14 +34,36 @@ def translate_text(text: str, language: str) -> str:
         Translated text string.
     """
     try:
-        from googletrans import Translator
-        translator = Translator()
-        result = translator.translate(text, dest=language)
-        return result.text
+        # Reverse map if full name is provided
+        language = language.lower()
+        for code, name in LANGUAGE_MAP.items():
+            if name.lower() == language:
+                language = code
+                break
+                
+        import os
+        from bhashini_translator import Bhashini
+        
+        # Ensure credentials are set for the library
+        if not os.environ.get("userID"):
+            os.environ["userID"] = os.getenv("BHASHINI_USER_ID", "")
+        if not os.environ.get("ulcaApiKey"):
+            os.environ["ulcaApiKey"] = os.getenv("BHASHINI_API_KEY", "")
+        if not os.environ.get("DefaultPipeLineId"):
+            os.environ["DefaultPipeLineId"] = os.getenv("BHASHINI_PIPELINE_ID", "64392f96daac500b55c543cd")
+            
+        b = Bhashini(sourceLanguage="en", targetLanguage=language)
+        result = b.translate(text)
+        return result
     except Exception as e:
-        print(f"Translation error: {e}")
-        # Fallback: return original text with a note
-        return f"[Translation pending - {LANGUAGE_MAP.get(language, language)}] {text}"
+        print(f"Bhashini Translation error: {e}")
+        # Secondary Fallback: deep_translator
+        try:
+            from deep_translator import GoogleTranslator
+            return GoogleTranslator(source='auto', target=language).translate(text)
+        except Exception as e2:
+             print(f"Deep Translator fallback failed: {e2}")
+             return f"[Translation pending - {LANGUAGE_MAP.get(language, language)}] {text}"
 
 
 def get_supported_languages() -> dict:

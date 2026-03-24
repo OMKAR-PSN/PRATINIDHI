@@ -10,6 +10,7 @@ import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
 import AskAvatar from './pages/AskAvatar'
 import Messages from './pages/Messages'
+import MessagePreview from './pages/MessagePreview'
 import ConsentOTP from './pages/ConsentOTP'
 import ConsentVerify from './pages/ConsentVerify'
 import Receivers from './pages/Receivers'
@@ -26,6 +27,7 @@ function App() {
         <Route path="/preview" element={<AvatarPreview />} />
         <Route path="/preview/:id" element={<AvatarPreview />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/message/:id/preview" element={<MessagePreview />} />
         <Route path="/view/:id" element={<CitizenView />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/receivers" element={<Receivers />} />

@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { getMessageHistory, markAsRead } from '../services/api'
+import { useTranslation } from 'react-i18next'
 import { 
   MessageSquare, Send, Inbox, Clock, CheckCircle2, XCircle, 
   Eye, Play, MoreVertical, Globe, BarChart3, Loader2 
 } from 'lucide-react'
 
 export default function Messages() {
+  const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState('sent') // 'sent' | 'inbox'
   const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState({ sent: [], inbox: [] })
@@ -15,7 +19,7 @@ export default function Messages() {
 
   const fetchHistory = async () => {
     try {
-      const { data } = await getMessageHistory(leaderId || 'admin')
+      const { data } = await getMessageHistory(leaderId || 'admin', i18n.language || 'en')
       setMessages(data)
     } catch (err) {
       console.error(err)
@@ -26,7 +30,7 @@ export default function Messages() {
 
   useEffect(() => {
     if (leaderId) fetchHistory()
-  }, [leaderId])
+  }, [leaderId, i18n.language])
 
   const handleRead = async (id) => {
     try {
@@ -44,9 +48,9 @@ export default function Messages() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              <MessageSquare className="w-6 h-6 text-blue-600" /> Messages
+              <MessageSquare className="w-6 h-6 text-blue-600" /> {t('msg_title', 'Messages')}
             </h1>
-            <p className="text-gray-500 text-sm mt-1">Full communication history and real-time updates</p>
+            <p className="text-gray-500 text-sm mt-1">{t('msg_sub', 'Full communication history and real-time updates')}</p>
           </div>
           <div className="flex bg-white/50 p-1 rounded-xl shadow-inner border border-gray-200/50">
             <button 
@@ -55,7 +59,7 @@ export default function Messages() {
                 activeTab === 'sent' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <Send className="w-4 h-4" /> Sent
+              <Send className="w-4 h-4" /> {t('msg_sent', 'Sent Broadcasts')}
             </button>
             <button 
               onClick={() => setActiveTab('inbox')}
@@ -63,7 +67,7 @@ export default function Messages() {
                 activeTab === 'inbox' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <Inbox className="w-4 h-4" /> Inbox
+              <Inbox className="w-4 h-4" /> {t('msg_inbox', 'Citizen Inbox')}
               {messages.inbox.filter(m => !m.is_read).length > 0 && (
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse ml-0.5" />
               )}
@@ -83,7 +87,7 @@ export default function Messages() {
                 <EmptyState icon={Send} text="You haven't sent any broadcasts yet." />
               ) : (
                 messages.sent.map(msg => (
-                  <SentMessageCard key={msg.id} msg={msg} />
+                  <SentMessageCard key={msg.id} msg={msg} onPreview={() => navigate(`/message/${msg.id}/preview`)} t={t} />
                 ))
               )
             ) : (
@@ -91,7 +95,7 @@ export default function Messages() {
                 <EmptyState icon={Inbox} text="Your inbox is currently empty." />
               ) : (
                 messages.inbox.map(msg => (
-                  <InboxMessageCard key={msg.id} msg={msg} onRead={() => handleRead(msg.id)} />
+                  <InboxMessageCard key={msg.id} msg={msg} onRead={() => handleRead(msg.id)} t={t} />
                 ))
               )
             )}
@@ -102,17 +106,17 @@ export default function Messages() {
   )
 }
 
-function SentMessageCard({ msg }) {
+function SentMessageCard({ msg, onPreview, t }) {
   return (
     <div className="glass-card rounded-2xl p-6 border-l-4 border-blue-500 shadow-sm transition-all hover:shadow-md">
       <div className="grid lg:grid-cols-5 gap-6 items-center">
         {/* Original Content & Details */}
         <div className="lg:col-span-2 space-y-2">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Sent Broadcast</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{t ? t('msg_sent_badge', 'Sent Broadcast') : 'Sent Broadcast'}</span>
             <span className="text-[10px] text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(msg.created_at).toLocaleString()}</span>
           </div>
-          <p className="text-sm font-semibold text-gray-800 line-clamp-2">{msg.message_text}</p>
+          <p className="text-sm font-semibold text-gray-800 line-clamp-2">{msg.display_text || msg.message_text}</p>
           <div className="flex items-center gap-3 mt-2">
             <div className="flex items-center gap-1 text-[11px] text-gray-500">
               <Globe className="w-3 h-3 text-saffron-500" /> {msg.original_language || 'Hindi'}
@@ -161,8 +165,8 @@ function SentMessageCard({ msg }) {
             <button className="p-2.5 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all btn-press">
               <BarChart3 className="w-4 h-4" />
             </button>
-            <button className="p-2.5 rounded-xl gradient-primary text-white shadow-lg shadow-blue-500/20 hover:scale-105 transition-all btn-press">
-              <Play className="w-4 h-4" />
+            <button onClick={onPreview} className="p-2.5 rounded-xl gradient-primary text-white shadow-lg shadow-blue-500/20 hover:scale-105 transition-all btn-press">
+              <Eye className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -171,7 +175,7 @@ function SentMessageCard({ msg }) {
   )
 }
 
-function InboxMessageCard({ msg, onRead }) {
+function InboxMessageCard({ msg, onRead, t }) {
   return (
     <div 
       onClick={onRead}

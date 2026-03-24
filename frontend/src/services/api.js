@@ -27,6 +27,10 @@ export const getMessages = async () => {
   return API.get('/messages')
 }
 
+export const getPreviewTranslation = async (data) => {
+  return API.post('/preview/translate', data)
+}
+
 export const getAnalytics = async () => {
   return API.get('/analytics')
 }
@@ -38,6 +42,10 @@ export const signUp = async (data) => {
 
 export const signIn = async (data) => {
   return API.post('/auth/login', data)
+}
+
+export const getMe = async (leaderId) => {
+  return API.get(`/auth/me?leader_id=${leaderId}`)
 }
 
 // ==================== Consent — Biometric ====================
@@ -85,8 +93,8 @@ export const sendMessage = async (data) => {
   return API.post('/messages/send', data)
 }
 
-export const getMessageHistory = async (leaderId) => {
-  return API.get(`/messages/history?leader_id=${leaderId}`)
+export const getMessageHistory = async (leaderId, lang = 'en') => {
+  return API.get(`/messages/history?leader_id=${leaderId}&lang=${lang}`)
 }
 
 export const markAsRead = async (msgId, leaderId) => {

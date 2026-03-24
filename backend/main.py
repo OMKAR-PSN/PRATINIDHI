@@ -6,14 +6,19 @@ from pydantic import BaseModel
 import os
 import uuid
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
+import cloudinary
+import cloudinary.uploader
 
 from translate import translate_text
 from tts import generate_speech
+from asr import transcribe_audio_bhashini
 from avatar import generate_avatar_video
 from utils import ensure_dirs, get_video_path, get_audio_path
 
 from database import test_connections, redis_client, db_execute
-from routes import consent, health, auth, receivers
+from routes import consent, health, auth, receivers, videos
 import notifications
 from signing import sign_video
 
@@ -38,6 +43,7 @@ app.include_router(consent.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(receivers.router, prefix="/api")
+app.include_router(videos.router, prefix="/api")
 
 app.mount("/output", StaticFiles(directory="../output"), name="output")
 app.mount("/avatars", StaticFiles(directory="../avatars"), name="avatars")
@@ -56,6 +62,10 @@ import hashlib as _hashlib
 
 class MCCCheckRequest(BaseModel):
     message: str
+
+class PreviewRequest(BaseModel):
+    text: str
+    language: str
 
 class RAGAskRequest(BaseModel):
     question: str
@@ -97,6 +107,25 @@ async def upload_image(image: UploadFile = File(...)):
     with open(filepath, "wb") as f:
         f.write(await image.read())
     return {"filename": filename, "path": filepath}
+
+@app.post("/api/asr")
+async def process_audio_asr(
+    audio: UploadFile = File(...),
+    language: str = Form(default="hi")
+):
+    if not audio.content_type.startswith("audio/") and not audio.content_type.startswith("video/"):
+        raise HTTPException(400, "File must be an audio recording")
+    
+    file_ext = os.path.splitext(audio.filename)[1] or ".m4a"
+    filename = f"asr_{uuid.uuid4().hex}{file_ext}"
+    filepath = os.path.join("..", "output", "audio", filename)
+    
+    with open(filepath, "wb") as f:
+        f.write(await audio.read())
+        
+    transcript = transcribe_audio_bhashini(filepath, language)
+    
+    return {"transcript": transcript, "language": language}
 
 
 @app.post("/api/avatar/generate")
@@ -196,6 +225,21 @@ async def create_avatar(
         raise HTTPException(500, f"Generation failed: {str(e)}")
 
 
+@app.post("/api/preview/translate")
+async def preview_translate(req: PreviewRequest):
+    try:
+        translated = translate_text(req.text, req.language)
+        filename = f"preview_{uuid.uuid4().hex[:8]}.mp3"
+        audio_path = os.path.join("..", "output", "audio", filename)
+        generate_speech(translated, req.language, audio_path)
+        return {
+            "translated_text": translated,
+            "audio_url": f"/output/audio/{filename}"
+        }
+    except Exception as e:
+        raise HTTPException(500, f"Preview generation failed: {str(e)}")
+
+
 @app.get("/api/messages/unread")
 async def get_unread_count(leader_id: str):
     if not redis_client:
@@ -241,6 +285,42 @@ async def send_message(req: BroadcastRequest):
             receiver_success = False
             
             trans_text = req.translated_text
+            r_lang = r.get("language") or req.language
+            audio_url = None
+            
+            # Cache translation and TTS per language
+            if not hasattr(send_message, "lang_cache"):
+                send_message.lang_cache = {}
+            if str(message_id) not in send_message.lang_cache:
+                send_message.lang_cache[str(message_id)] = {}
+                
+            cache = send_message.lang_cache[str(message_id)]
+            
+            if r_lang not in cache:
+                if r_lang == req.language:
+                    tgt_text = req.translated_text
+                else:
+                    tgt_text = translate_text(req.message, r_lang)
+                
+                tgt_audio_url = None
+                try:
+                    os.makedirs(os.path.join("..", "output", "audio"), exist_ok=True)
+                    audio_path = os.path.join("..", "output", "audio", f"msg_{message_id}_{r_lang}.mp3")
+                    generate_speech(tgt_text, r_lang, audio_path)
+                    res = cloudinary.uploader.upload(audio_path, resource_type="video")
+                    tgt_audio_url = res.get("secure_url")
+                except Exception as e:
+                    print(f"TTS/Cloudinary Error for {r_lang}: {e}")
+                    
+                cache[r_lang] = {"text": tgt_text, "audio_url": tgt_audio_url}
+                db_execute(
+                    "INSERT INTO message_translations (message_id, language, translated_text, audio_url) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING",
+                    (message_id, r_lang, tgt_text, tgt_audio_url),
+                    commit=True
+                )
+                
+            trans_text = cache[r_lang]["text"]
+            audio_url = cache[r_lang]["audio_url"]
             
             # Inbox for App Users
             if r.get("is_app_user") and r.get("app_user_id"):
@@ -269,7 +349,7 @@ async def send_message(req: BroadcastRequest):
             # WhatsApp
             if r.get("has_whatsapp") and r.get("receiver_phone"):
                 wa_text = f"Official Announcement:\n{trans_text}"
-                ok, msg = notifications.send_whatsapp(r["receiver_phone"], wa_text)
+                ok, msg = notifications.send_whatsapp(r["receiver_phone"], wa_text, media_url=audio_url)
                 if ok:
                     p_wa = "sent"
                     receiver_success = True
@@ -312,10 +392,13 @@ async def send_message(req: BroadcastRequest):
     return {"success": True, "message_id": str(message_id), "sent": sent, "failed": failed}
 
 @app.get("/api/messages/history")
-async def get_message_history(leader_id: str):
+async def get_message_history(leader_id: str, lang: str = "en"):
     sent = db_execute(
-        "SELECT * FROM messages WHERE sender_id = %s ORDER BY created_at DESC",
-        (leader_id,),
+        """SELECT m.*, t.translated_text as display_text 
+           FROM messages m 
+           LEFT JOIN message_translations t ON m.id = t.message_id AND t.language = %s 
+           WHERE m.sender_id = %s ORDER BY m.created_at DESC""",
+        (lang, leader_id),
         fetchall=True
     )
     inbox = db_execute(
@@ -328,6 +411,35 @@ async def get_message_history(leader_id: str):
         fetchall=True
     )
     return {"sent": sent or [], "inbox": inbox or []}
+
+@app.get("/api/messages/{msg_id}/preview")
+async def get_message_preview(msg_id: str, leader_id: str):
+    msg = db_execute("SELECT * FROM messages WHERE id = %s", (msg_id,), fetchone=True)
+    if not msg:
+        raise HTTPException(404, "Message not found")
+        
+    if str(msg["sender_id"]) != leader_id:
+        leader = db_execute("SELECT role FROM leaders WHERE id = %s", (leader_id,), fetchone=True)
+        if not leader or leader["role"] != "admin":
+            raise HTTPException(403, "Unauthorized")
+            
+    translations = db_execute("SELECT language, translated_text, audio_url, video_url FROM message_translations WHERE message_id = %s", (msg_id,), fetchall=True)
+    
+    delivery = db_execute(
+        """
+        SELECT 
+            COUNT(*) as total,
+            COUNT(CASE WHEN whatsapp_status = 'pending' AND sms_status = 'pending' AND email_status = 'pending' THEN 1 END) as pending,
+            COUNT(CASE WHEN whatsapp_status = 'sent' OR sms_status = 'sent' OR email_status = 'sent' THEN 1 END) as delivered
+        FROM message_recipients WHERE message_id = %s
+        """, (msg_id,), fetchone=True
+    )
+    
+    return {
+        "message": msg,
+        "translations": translations or [],
+        "delivery": delivery
+    }
 
 @app.post("/api/messages/read/{msg_id}")
 async def mark_as_read(msg_id: str, leader_id: str):
@@ -352,12 +464,16 @@ async def get_avatar(avatar_id: str):
             "translated_text": "पीएम किसान योजना पंजीकरण अब खुला है।",
             "language": "hi",
             "videoUrl": None,
+            "audioUrl": "/output/audio/demo.mp3",
             "created_at": datetime.now().isoformat(),
             "consent_status": "demo",
         }
     if avatar_id not in avatars_db:
         raise HTTPException(404, "Avatar not found")
-    return avatars_db[avatar_id]
+    
+    data = avatars_db[avatar_id]
+    data["audioUrl"] = f"/output/audio/{avatar_id}.mp3"
+    return data
 
 
 @app.get("/api/messages")

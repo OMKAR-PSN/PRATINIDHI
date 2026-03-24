@@ -7,13 +7,14 @@ import {
   Video, Globe, Shield, Activity, Image as ImageIcon,
   MessageSquare, Mic, MapPin, Search
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-// Mock Data
+// Avatar Roster
 const avatarTiles = [
-  { id: 'leader1', name: 'Official Speaker', type: 'Authoritative', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80' },
-  { id: 'leader2', name: 'Regional Rep (Female)', type: 'Empathetic', img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80' },
-  { id: 'leader3', name: 'Youth Leader', type: 'Energetic', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80' },
-  { id: 'leader4', name: 'Senior Advisor', type: 'Experienced', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80' },
+  { id: 'leader1', nameKey: 'avatar_asha', typeKey: 'avatar_asha_desc', img: '/avatars/asha.png' },
+  { id: 'leader2', nameKey: 'avatar_arjun', typeKey: 'avatar_arjun_desc', img: '/avatars/arjun.jpg' },
+  { id: 'leader3', nameKey: 'avatar_murugan', typeKey: 'avatar_murugan_desc', img: '/avatars/murugan.png' },
+  { id: 'leader4', nameKey: 'avatar_priya', typeKey: 'avatar_priya_desc', img: '/avatars/priya.jpg' },
 ]
 
 
@@ -26,6 +27,7 @@ const languages = [
 ]
 
 export default function CreateAvatar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [step, setStep] = useState(1)
@@ -34,6 +36,51 @@ export default function CreateAvatar() {
   const [message, setMessage] = useState(() => localStorage.getItem('draftMessage') || '')
   const [isRecording, setIsRecording] = useState(false)
   
+  const savedLang = localStorage.getItem('userLanguage') || 'hi'
+  const defaultDictationLang = savedLang === 'en' ? 'en-IN' : savedLang + '-IN'
+  const [dictationLang, setDictationLang] = useState(defaultDictationLang)
+  
+  const recognitionRef = useRef(null)
+
+  useEffect(() => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      recognitionRef.current = new SpeechRecognition()
+      recognitionRef.current.continuous = true
+      recognitionRef.current.interimResults = true
+
+      recognitionRef.current.onresult = (event) => {
+        let finalTranscript = ''
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript
+          }
+        }
+        if (finalTranscript) {
+          setMessage(prev => {
+            const space = prev.length > 0 && !prev.endsWith(' ') && !prev.endsWith('\n') ? ' ' : ''
+            return prev + space + finalTranscript
+          })
+        }
+      }
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error)
+        setIsRecording(false)
+      }
+      
+      recognitionRef.current.onend = () => {
+        setIsRecording(false)
+      }
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
+  }, [])
+
   // Step 2: Avatar
   const [selectedAvatar, setSelectedAvatar] = useState(null)
 
@@ -44,12 +91,22 @@ export default function CreateAvatar() {
 
 
   const toggleRecording = () => {
-    setIsRecording(!isRecording)
-    if (!isRecording) {
-      setTimeout(() => {
-        setMessage((prev) => prev ? prev + ' [Audio captured]' : 'Greetings citizens, this is a simulated voice transcript.')
-        setIsRecording(false)
-      }, 3000)
+    if (!recognitionRef.current) {
+      alert("Your browser doesn't support speech recognition. Please use Google Chrome.")
+      return
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop()
+      setIsRecording(false)
+    } else {
+      try {
+        recognitionRef.current.lang = dictationLang
+        recognitionRef.current.start()
+        setIsRecording(true)
+      } catch (e) {
+        console.error("Speech API start error:", e)
+      }
     }
   }
 
@@ -110,8 +167,8 @@ export default function CreateAvatar() {
         <div className="max-w-4xl mx-auto">
           {/* Header & Progress */}
           <div className="mb-8">
-            <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight">Create Announcement</h1>
-            <p className="text-gray-500 text-sm mt-1">AI-powered multilingual avatar generation pipeline</p>
+            <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight">{t('create_title', 'Create Announcement')}</h1>
+            <p className="text-gray-500 text-sm mt-1">{t('create_sub', 'AI-powered multilingual avatar generation pipeline')}</p>
 
             {/* Stepper */}
             <div className="mt-8 relative">
@@ -119,9 +176,9 @@ export default function CreateAvatar() {
               <div className="absolute top-1/2 left-0 h-0.5 gradient-primary -translate-y-1/2 transition-all duration-500" style={{ width: `${((step - 1) / 2) * 100}%` }} />
               <div className="relative flex justify-between">
                 {[
-                  { num: 1, label: 'Content', icon: MessageSquare },
-                  { num: 2, label: 'Avatar', icon: ImageIcon },
-                  { num: 3, label: 'Generate', icon: Wand2 }
+                  { num: 1, label: t('create_step1', 'Content'), icon: MessageSquare },
+                  { num: 2, label: t('create_step2', 'Avatar'), icon: ImageIcon },
+                  { num: 3, label: t('create_step3', 'Generate'), icon: Wand2 }
                 ].map((s) => (
                   <div key={s.num} className="flex flex-col items-center gap-2">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-sm transition-all duration-300 ${
@@ -142,15 +199,30 @@ export default function CreateAvatar() {
               <div className="animate-fade-in-up">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="font-heading font-semibold text-gray-900 text-lg">Input Message</h3>
-                    <p className="text-gray-500 text-sm">Type your announcement or record a voice note.</p>
+                    <h3 className="font-heading font-semibold text-gray-900 text-lg">{t('create_msg_title', 'Input Message')}</h3>
+                    <p className="text-gray-500 text-sm">{t('create_msg_sub', 'Type your announcement or record a voice note.')}</p>
                   </div>
-                  <button onClick={toggleRecording} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all ${
-                    isRecording ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}>
-                    <Mic className={`w-4 h-4 ${isRecording ? 'animate-bounce' : ''}`} />
-                    {isRecording ? 'Recording (Stop)' : 'Record Voice'}
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={dictationLang}
+                      onChange={(e) => setDictationLang(e.target.value)}
+                      disabled={isRecording}
+                      className="px-3 py-2 bg-gray-50 rounded-xl text-xs outline-none border border-gray-200 focus:ring-1 focus:ring-blue-400"
+                    >
+                      <option value="en-IN">English</option>
+                      <option value="hi-IN">Hindi (हिन्दी)</option>
+                      <option value="mr-IN">Marathi (मराठी)</option>
+                      <option value="ta-IN">Tamil (தமிழ்)</option>
+                      <option value="te-IN">Telugu (తెలుగు)</option>
+                      <option value="bn-IN">Bengali (বাংলা)</option>
+                    </select>
+                    <button onClick={toggleRecording} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all ${
+                      isRecording ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}>
+                      <Mic className={`w-4 h-4 ${isRecording ? 'animate-bounce' : ''}`} />
+                      {isRecording ? 'Recording (Stop)' : t('create_record', 'Record Voice')}
+                    </button>
+                  </div>
                 </div>
                 {isRecording && (
                   <div className="mb-4 h-12 rounded-xl bg-red-50/50 border border-red-100 flex items-center justify-center gap-1 overflow-hidden">
@@ -162,7 +234,7 @@ export default function CreateAvatar() {
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="e.g., Dear Citizens, the new health clinic is opening tomorrow..."
+                  placeholder={t('create_ph', 'e.g., Dear Citizens, the new health clinic is opening tomorrow...')}
                   className="w-full h-48 px-5 py-4 glass-card rounded-xl text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none resize-none border border-gray-200/50 leading-relaxed"
                 />
               </div>
@@ -174,12 +246,12 @@ export default function CreateAvatar() {
               <div className="animate-fade-in-up">
                 <div className="mb-6 flex items-center justify-between">
                   <div>
-                    <h3 className="font-heading font-semibold text-gray-900 text-lg">Select an Avatar</h3>
-                    <p className="text-gray-500 text-sm">Pick the digital representative to deliver the message.</p>
+                    <h3 className="font-heading font-semibold text-gray-900 text-lg">{t('create_avatar_title', 'Select an Avatar')}</h3>
+                    <p className="text-gray-500 text-sm">{t('create_avatar_sub', 'Pick the digital representative to deliver the message.')}</p>
                   </div>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input type="text" placeholder="Search styles..." className="pl-9 pr-4 py-2 bg-gray-50 rounded-lg text-xs outline-none border border-gray-200 focus:ring-1 focus:ring-blue-400" />
+                    <input type="text" placeholder={t('create_search', 'Search styles...')} className="pl-9 pr-4 py-2 bg-gray-50 rounded-lg text-xs outline-none border border-gray-200 focus:ring-1 focus:ring-blue-400" />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -189,12 +261,12 @@ export default function CreateAvatar() {
                       <div key={avatar.id} onClick={() => setSelectedAvatar(avatar.id)} className={`relative cursor-pointer group rounded-xl overflow-hidden shadow-sm transition-all duration-300 ${
                         isSelected ? 'ring-4 ring-blue-500 scale-105' : 'hover:shadow-md'
                       }`}>
-                        <div className="aspect-[3/4] overflow-hidden">
-                          <img src={avatar.img} alt={avatar.name} className={`w-full h-full object-cover transition-transform duration-700 ${isSelected ? '' : 'group-hover:scale-110'}`} />
+                        <div className="aspect-[3/4] overflow-hidden bg-gray-100 flex items-center justify-center">
+                          <img src={avatar.img} alt={avatar.name} className={`w-full h-full object-contain transition-transform duration-700 ${isSelected ? '' : 'group-hover:scale-110'}`} />
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                          <p className="text-white font-semibold text-sm drop-shadow-md">{avatar.name}</p>
-                          <p className="text-white/70 text-[10px] font-medium">{avatar.type}</p>
+                          <p className="text-white font-semibold text-sm drop-shadow-md">{t(avatar.nameKey, 'Avatar')}</p>
+                          <p className="text-white/70 text-[10px] font-medium">{t(avatar.typeKey, 'Speaker')}</p>
                         </div>
                         {isSelected && (
                           <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
@@ -217,16 +289,16 @@ export default function CreateAvatar() {
                        <Wand2 className="w-10 h-10 text-white relative z-10 group-hover:rotate-12 transition-transform" />
                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                      </div>
-                     <h3 className="font-heading font-semibold text-gray-900 text-2xl mb-2">Ready to Broadcast</h3>
-                     <p className="text-gray-500 text-sm mb-8">Select target language and begin AI generation pipeline.</p>
+                     <h3 className="font-heading font-semibold text-gray-900 text-2xl mb-2">{t('create_ready', 'Ready to Broadcast')}</h3>
+                     <p className="text-gray-500 text-sm mb-8">{t('create_ready_sub', 'Select target language and begin AI generation pipeline.')}</p>
                      
                      <div className="text-left bg-gray-50/50 p-5 rounded-2xl border border-gray-100 mb-8 space-y-3">
                        <div className="flex items-center justify-between">
-                         <span className="text-sm font-semibold text-gray-700">Message Length:</span>
+                         <span className="text-sm font-semibold text-gray-700">{t('create_len', 'Message Length:')}</span>
                          <span className="text-sm text-gray-500">{message.length} chars</span>
                        </div>
                        <div className="pt-3 border-t border-gray-200">
-                         <label className="block text-sm font-semibold text-gray-700 mb-2">Translation Language <span className="text-[10px] bg-saffron-100 text-saffron-700 px-2 py-0.5 rounded-full ml-1 font-bold">BHASHINI</span></label>
+                         <label className="block text-sm font-semibold text-gray-700 mb-2">{t('create_trans_lang', 'Translation Language')} <span className="text-[10px] bg-saffron-100 text-saffron-700 px-2 py-0.5 rounded-full ml-1 font-bold">BHASHINI</span></label>
                          <select value={language} onChange={e => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-white rounded-xl text-sm border border-gray-200 focus:border-blue-400 outline-none shadow-sm cursor-pointer">
                            {languages.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
                          </select>
@@ -235,7 +307,7 @@ export default function CreateAvatar() {
                    </div>
                 ) : (
                   <div className="w-full max-w-lg">
-                    <h3 className="text-center font-heading font-bold text-xl text-gray-900 mb-8">Processing AI Pipeline</h3>
+                    <h3 className="text-center font-heading font-bold text-xl text-gray-900 mb-8">{t('create_proc', 'Processing AI Pipeline')}</h3>
                     <div className="space-y-6">
                       {[
                         { step: 1, label: 'Content Safety & MCC Check', desc: 'Validating announcement text' },
@@ -268,7 +340,7 @@ export default function CreateAvatar() {
               disabled={step === 1 || isGenerating}
               className="px-6 py-2.5 rounded-xl font-semibold text-sm text-gray-600 hover:bg-white hover:shadow-sm disabled:opacity-30 transition-all btn-press"
             >
-              Back
+              {t('create_back', 'Back')}
             </button>
             
             {step < 3 ? (
@@ -277,7 +349,7 @@ export default function CreateAvatar() {
                 disabled={(step === 1 && !message) || (step === 2 && !selectedAvatar)}
                 className="px-6 py-2.5 rounded-xl gradient-primary text-white font-semibold text-sm hover:shadow-lg hover:shadow-blue-500/25 flex items-center gap-2 transition-all btn-press disabled:opacity-50"
               >
-                Continue <ArrowRight className="w-4 h-4" />
+                {t('create_cont', 'Continue')} <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               !isGenerating && (
@@ -285,7 +357,7 @@ export default function CreateAvatar() {
                   onClick={handleGenerate}
                   className="px-8 py-3 rounded-xl gradient-primary text-white font-bold flex items-center gap-2 hover:shadow-xl hover:shadow-blue-500/30 transition-all btn-press animate-float-slow"
                 >
-                  <Wand2 className="w-5 h-5" /> Generate Avatar
+                  <Wand2 className="w-5 h-5" /> {t('create_gen_btn', 'Generate Avatar')}
                 </button>
               )
             )}

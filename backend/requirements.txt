@@ -1,8 +1,9 @@
 fastapi==0.109.2
 uvicorn==0.27.1
 python-multipart==0.0.9
-googletrans==4.0.0-rc.1
-gTTS==2.5.1
+deep-translator==1.11.4
+edge-tts==6.1.12
+bhashini_translator==0.0.4
 aiofiles==23.2.1
 psycopg2-binary
 motor
@@ -10,3 +11,5 @@ redis
 python-jose[cryptography]
 python-dotenv
 resend
+cloudinary
+twilio

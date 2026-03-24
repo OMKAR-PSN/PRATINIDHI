@@ -23,3 +23,7 @@ output/audio/
 # OS
 .DS_Store
 Thumbs.db
+
+# Ignore Secure Biometric Images
+backend/avatars/faces/
+avatars/faces/
