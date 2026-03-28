@@ -4,18 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== SCROLL REVEAL ===== */
+/* ===== SCROLL REVEAL / TIME REVEAL ===== */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(48px) scale(0.96);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Always honour the --delay variable set inline */
+  transition-delay: var(--delay, 0s);
+  will-change: opacity, transform;
 }
 .scroll-reveal.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
-.scroll-reveal[style*="animationDelay"] {
-  transition-delay: calc(var(--delay, 0s));
+
+/* Clip-path wipe variant — add class "time-reveal-wipe" alongside scroll-reveal for a curtain lift */
+.time-reveal-wipe {
+  clip-path: inset(100% 0 0 0);
+  transition:
+    clip-path 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease;
+  transition-delay: var(--delay, 0s);
+}
+.time-reveal-wipe.visible {
+  clip-path: inset(0% 0 0 0);
 }
 
 /* ===== CSS CUSTOM PROPERTIES ===== */

@@ -283,7 +283,7 @@ const FeatureSection = ({ title, desc, features, startIndex }) => (
             key={i}
             id={id}
             className={`group glass-card rounded-2xl p-6 hover-lift scroll-reveal cursor-default border-t-2 ${c.border} flex flex-col h-full`}
-            style={{ '--delay': `${(i % 4) * 0.1}s` }}
+            style={{ '--delay': `${(i % 4) * 0.15}s` }}
           >
             <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center shadow-lg ${c.shadow} group-hover:scale-110 transition-transform duration-300`}>
               <Icon className="w-6 h-6 text-white" />
@@ -370,10 +370,10 @@ export default function LandingPage() {
               </div>
 
               <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight scroll-reveal" style={{ '--delay': '0.1s' }}>
-                AI Video Generator
+                Pratinidhi
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-saffron-400 via-saffron-300 to-saffron-400">
-                  for Governance
+                  India's AI-Powered Multilingual Governance Avatar Platform
                 </span>
               </h1>
 

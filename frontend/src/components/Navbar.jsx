@@ -35,8 +35,8 @@ export default function Navbar({ transparent = false, showSearch = false }) {
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-12 h-12 min-w-[48px] group-hover:scale-105 transition-transform duration-300 rounded-xl overflow-hidden shadow-sm">
-              <img src="/logo_web.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
+            <div className="flex items-center justify-center w-12 h-12 min-w-[48px] group-hover:scale-105 transition-transform duration-300 rounded-full overflow-hidden shadow-sm">
+              <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col">
               <span className={`font-heading font-extrabold text-xl tracking-tight leading-none ${logoText} transition-colors duration-300`}>
