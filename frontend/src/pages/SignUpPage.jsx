@@ -93,14 +93,11 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#F5F0E1] p-12 items-center justify-center">
-        {/* Brand Logo Overlay */}
-        <div className="absolute top-8 left-8 flex items-center gap-3 z-20">
-          <div className="flex items-center justify-center relative w-12 h-12 min-w-[48px]">
-            <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-lg" />
-            <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+      <div className="hidden lg:flex lg:w-1/2 flex-col overflow-hidden bg-[#F5F0E1]">
+        {/* Logo bar — sits cleanly above the image */}
+        <div className="flex items-center gap-3 px-10 pt-8 pb-4">
+          <div className="flex items-center justify-center w-12 h-12 min-w-[48px] rounded-full overflow-hidden shadow-lg">
+            <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex items-baseline">
             <span className="font-heading font-extrabold text-2xl tracking-tight text-gray-900 drop-shadow-sm">
@@ -110,19 +107,22 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        <img
-          src="/janavatar-hero.png"
-          alt="JanAvatar AI Platform"
-          className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700"
-        />
+        {/* Hero image fills the rest */}
+        <div className="flex-1 flex items-center justify-center px-10 pb-10">
+          <img
+            src="/janavatar-hero.png"
+            alt="JanAvatar AI Platform"
+            className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700"
+          />
+        </div>
       </div>
 
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 gradient-subtle">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <Globe className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-full overflow-hidden shadow-md">
+              <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-heading font-bold text-xl text-gray-900">Prati<span className="text-saffron-500">nidhi</span> AI</span>
           </div>

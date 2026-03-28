@@ -45,12 +45,9 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex items-center justify-center relative w-9 h-9 min-w-[36px]">
-            <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-md"></div>
-            <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner hover-scale">
-              <Shield className="w-4 h-4 text-white" />
+          <div className="flex items-center justify-center w-9 h-9 min-w-[36px] rounded-full overflow-hidden shadow-md hover-scale">
+              <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
             </div>
-          </div>
           {!collapsed && (
             <span className="font-heading font-extrabold text-lg tracking-tight text-gray-900 whitespace-nowrap ml-1">
               PRATI<span className="text-saffron-500">NIDHI</span><span className="text-primary-600 text-[9px] uppercase ml-1 align-top tracking-widest font-semibold">AI</span>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Navbar from '../components/Navbar'
 import ParticleNetwork from '../components/ParticleNetwork'
 import {
@@ -308,21 +308,32 @@ export default function LandingPage() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [infoModal, setInfoModal] = useState({ open: false, section: '' })
 
+  const [showIntro, setShowIntro] = useState(true)
+  const [introFading, setIntroFading] = useState(false)
+  const videoRef = useRef(null)
+
+  const dismissIntro = useCallback(() => {
+    setIntroFading(true)
+    setTimeout(() => setShowIntro(false), 700)
+  }, [])
+
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible')
-        }
-      })
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
+    if (!showIntro) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+          }
+        })
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
 
-    const elements = document.querySelectorAll('.scroll-reveal')
-    elements.forEach((el) => observer.observe(el))
-    
-    return () => observer.disconnect()
-  }, [])
+      const elements = document.querySelectorAll('.scroll-reveal')
+      elements.forEach((el) => observer.observe(el))
+      
+      return () => observer.disconnect()
+    }
+  }, [showIntro])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -343,6 +354,58 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-cream-50">
+      {/* ===== VIDEO INTRO OVERLAY ===== */}
+      {showIntro && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: introFading ? 0 : 1,
+            transition: 'opacity 0.7s ease',
+            pointerEvents: introFading ? 'none' : 'auto',
+          }}
+        >
+          <video
+            ref={videoRef}
+            src="/intro_video.mp4"
+            autoPlay
+            muted
+            playsInline
+            onEnded={dismissIntro}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {/* Skip button */}
+          <button
+            onClick={dismissIntro}
+            style={{
+              position: 'absolute',
+              bottom: '2.5rem',
+              right: '2.5rem',
+              background: 'rgba(255,255,255,0.12)',
+              border: '1.5px solid rgba(255,255,255,0.3)',
+              color: '#fff',
+              fontFamily: 'inherit',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              padding: '0.6rem 1.6rem',
+              borderRadius: '999px',
+              cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
+              letterSpacing: '0.04em',
+              transition: 'background 0.2s, transform 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.22)'; e.currentTarget.style.transform = 'scale(1.05)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'scale(1)' }}
+          >
+            Skip Intro ›
+          </button>
+        </div>
+      )}
       <Navbar transparent />
 
       {/* ===== HERO ===== */}

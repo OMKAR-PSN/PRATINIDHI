@@ -50,15 +50,23 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — Hero image with Logo */}
+      {/* Mobile-only Hero Header - shown first on small screens */}
+      <div className="lg:hidden w-full bg-[#F5F0E1] p-8 pb-0 flex flex-col items-center">
+        <div className="w-full max-w-sm">
+          <img
+            src="/janavatar-hero.png"
+            alt="JanAvatar AI Platform"
+            className="w-full h-auto drop-shadow-xl"
+          />
+        </div>
+      </div>
+
+      {/* Hero panel — Hero image with Logo - Hidden on mobile, shown on large screens */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#F5F0E1] p-12 items-center justify-center">
         {/* Brand Logo Overlay */}
         <div className="absolute top-8 left-8 flex items-center gap-3 z-20">
-          <div className="flex items-center justify-center relative w-12 h-12 min-w-[48px]">
-            <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-lg" />
-            <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex items-center justify-center w-12 h-12 min-w-[48px] rounded-full overflow-hidden shadow-lg">
+            <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex items-baseline">
             <span className="font-heading font-extrabold text-2xl tracking-tight text-gray-900 drop-shadow-sm">
@@ -75,19 +83,16 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Right panel — Login form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white relative">
+      {/* Form panel */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 bg-white relative overflow-hidden">
         <div className="absolute inset-0 gradient-mesh opacity-30" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-saffron-500/3 rounded-full blur-3xl" />
 
         <div className="relative w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="flex items-center justify-center relative w-11 h-11 min-w-[44px]">
-              <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-md"></div>
-              <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
+          {/* Mobile logo header - slightly adjusted */}
+          <div className="lg:hidden flex items-center gap-3 mb-6">
+            <div className="flex items-center justify-center w-11 h-11 min-w-[44px] rounded-full overflow-hidden shadow-md">
+              <img src="/pr_logo.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="font-heading font-extrabold text-xl text-gray-900">
@@ -98,12 +103,12 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="font-heading text-3xl font-bold text-gray-900 tracking-tight">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
               {view === 'login' ? 'Welcome back' : 'Sign in with PIN'}
             </h2>
             <p className="text-gray-500 mt-2 text-base">
               {view === 'login' 
-                ? 'Sign in to your admin portal to manage announcements.' 
+                ? 'Sign in to manage and broadcast announcements.' 
                 : 'Forgot your password? Sign in using your registered 6-digit Security PIN.'}
             </p>
           </div>
