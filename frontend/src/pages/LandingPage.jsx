@@ -11,6 +11,7 @@ import {
   Scale, PhoneCall, Network, Map, KeySquare, Activity, FileText, AlertTriangle, Monitor, TrendingUp
 } from 'lucide-react'
 import IndicTranslationIcon from '../components/IndicTranslationIcon'
+import InfoModal from '../components/InfoModal'
 
 const avatarData = [
   { state: 'GUJARAT', lang: 'Gujarati', image: '/avatars/gujarat.png', gradient: 'from-amber-400 to-orange-500' },
@@ -239,17 +240,17 @@ const trustedBy = ['BHASHINI', 'NIC', 'Digital India', 'MeitY', 'NeGD']
 
 // Category 1: Core Features
 const coreFeatures1 = [
-  { icon: Video, title: '01. Avatar Creation Engine', desc: 'Clones leader or educator face from a 2-minute video. Generates a multilingual lip-synced avatar using SadTalker and Wav2Lip. Supports 240p to 1080p output.', color: 'primary', tags: ['Lip-Sync', 'Photo-to-Video'] },
-  { icon: IndicTranslationIcon, title: '02. BHASHINI Integration', desc: 'Real-time speech translation across all 22 scheduled Indian languages plus dialect detection. Powered by the Government of India BHASHINI API at zero cost.', color: 'saffron', tags: ['22+ Languages', 'Zero Cost'] },
-  { icon: Shield, title: '03. Consent-Lock Module', desc: 'Biometric or OTP approval required before any avatar can speak content. Every approved message is cryptographically signed. Prevents deepfake misuse.', color: 'green', tags: ['OTP Verified', 'Anti-Deepfake'] },
-  { icon: Smartphone, title: '04. Low-Bandwidth Engine', desc: 'Compresses avatar video to WhatsApp-forward-ready 240p. Automatic SMS text fallback for zero-data zones. Designed for 2G connectivity.', color: 'primary', tags: ['2G Ready', 'SMS Fallback'] },
+  { id: 'avatar-generator', icon: Video, title: '01. Avatar Creation Engine', desc: 'Clones leader or educator face from a 2-minute video. Generates a multilingual lip-synced avatar using SadTalker and Wav2Lip. Supports 240p to 1080p output.', color: 'primary', tags: ['Lip-Sync', 'Photo-to-Video'] },
+  { id: 'translation-engine', icon: IndicTranslationIcon, title: '02. BHASHINI Integration', desc: 'Real-time speech translation across all 22 scheduled Indian languages plus dialect detection. Powered by the Government of India BHASHINI API at zero cost.', color: 'saffron', tags: ['22+ Languages', 'Zero Cost'] },
+  { id: 'consent-lock', icon: Shield, title: '03. Consent-Lock Module', desc: 'Biometric or OTP approval required before any avatar can speak content. Every approved message is cryptographically signed. Prevents deepfake misuse.', color: 'green', tags: ['OTP Verified', 'Anti-Deepfake'] },
+  { id: 'low-bandwidth', icon: Smartphone, title: '04. Low-Bandwidth Engine', desc: 'Compresses avatar video to WhatsApp-forward-ready 240p. Automatic SMS text fallback for zero-data zones. Designed for 2G connectivity.', color: 'primary', tags: ['2G Ready', 'SMS Fallback'] },
 ]
 
 const coreFeatures2 = [
-  { icon: MessageSquare, title: '05. Interactive Q&A Avatar', desc: 'Citizens ask the avatar questions in their local language. A RAG pipeline over government scheme PDFs powered by LLaMA 3 generates accurate answers.', color: 'saffron', tags: ['RAG-Powered', 'LLaMA 3'] },
-  { icon: Scale, title: '06. MCC Compliance Filter', desc: 'An NLP layer checks all content against the Election Commission of India Model Code of Conduct before any avatar message is published. Blocks violations.', color: 'green', tags: ['ECI Compliant', 'NLP Filter'] },
-  { icon: BarChart3, title: '07. Analytics Dashboard', desc: 'Tracks reach, language distribution, citizen engagement, call volume per scheme, and scheme awareness uplift per district.', color: 'primary', tags: ['Measurable ROI', 'Real-time'] },
-  { icon: Users, title: '08. Role-Based Access Control', desc: 'Differentiated access for Sarpanch, MLA, MP, Educator, and Institution. Each role has scoped avatar creation and delivery rights.', color: 'saffron', tags: ['RBAC', 'Scoped Access'] },
+  { id: 'citizen-qa', icon: MessageSquare, title: '05. Interactive Q&A Avatar', desc: 'Citizens ask the avatar questions in their local language. A RAG pipeline over government scheme PDFs powered by LLaMA 3 generates accurate answers.', color: 'saffron', tags: ['RAG-Powered', 'LLaMA 3'] },
+  { id: 'mcc-compliance', icon: Scale, title: '06. MCC Compliance Filter', desc: 'An NLP layer checks all content against the Election Commission of India Model Code of Conduct before any avatar message is published. Blocks violations.', color: 'green', tags: ['ECI Compliant', 'NLP Filter'] },
+  { id: 'analytics', icon: BarChart3, title: '07. Analytics Dashboard', desc: 'Tracks reach, language distribution, citizen engagement, call volume per scheme, and scheme awareness uplift per district.', color: 'primary', tags: ['Measurable ROI', 'Real-time'] },
+  { id: 'rbac', icon: Users, title: '08. Role-Based Access Control', desc: 'Differentiated access for Sarpanch, MLA, MP, Educator, and Institution. Each role has scoped avatar creation and delivery rights.', color: 'saffron', tags: ['RBAC', 'Scoped Access'] },
 ]
 
 // Category 2: New Unique Features
@@ -275,11 +276,12 @@ const FeatureSection = ({ title, desc, features, startIndex }) => (
       <p className="text-gray-500 mt-3 text-lg">{desc}</p>
     </div>
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {features.map(({ icon: Icon, title: featureTitle, desc: featureDesc, color, tags }, i) => {
+      {features.map(({ id, icon: Icon, title: featureTitle, desc: featureDesc, color, tags }, i) => {
         const c = colorConfig[color]
         return (
           <div
             key={i}
+            id={id}
             className={`group glass-card rounded-2xl p-6 hover-lift scroll-reveal cursor-default border-t-2 ${c.border} flex flex-col h-full`}
             style={{ '--delay': `${(i % 4) * 0.1}s` }}
           >
@@ -304,6 +306,8 @@ const FeatureSection = ({ title, desc, features, startIndex }) => (
 
 export default function LandingPage() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [infoModal, setInfoModal] = useState({ open: false, section: '' })
+
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -809,24 +813,60 @@ export default function LandingPage() {
             <div>
               <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-gray-400 mb-4">Platform</h4>
               <ul className="space-y-3">
-                {['Avatar Generator', 'Translation Engine', 'Citizen Q&A', 'Analytics'].map((item) => (
-                  <li key={item}><a href="#" className="text-gray-500 text-sm hover:text-white transition-colors">{item}</a></li>
+                {[
+                  { label: 'Avatar Generator', id: 'avatar-generator' },
+                  { label: 'Translation Engine', id: 'translation-engine' },
+                  { label: 'Citizen Q&A', id: 'citizen-qa' },
+                  { label: 'Analytics', id: 'analytics' }
+                ].map((item) => (
+                  <li key={item.label}>
+                    <button 
+                      onClick={() => setInfoModal({ open: true, section: item.id })}
+                      className="text-gray-500 text-sm hover:text-white transition-colors text-left"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
               <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-gray-400 mb-4">Resources</h4>
               <ul className="space-y-3">
-                {['Documentation', 'API Reference', 'Integration Guide', 'Case Studies'].map((item) => (
-                  <li key={item}><a href="#" className="text-gray-500 text-sm hover:text-white transition-colors">{item}</a></li>
+                {[
+                  { name: 'Documentation', slug: 'documentation' },
+                  { name: 'API Reference', slug: 'api-reference' },
+                  { name: 'Integration Guide', slug: 'integration-guide' },
+                  { name: 'Case Studies', slug: 'case-studies' }
+                ].map((item) => (
+                  <li key={item.name}>
+                    <button 
+                      onClick={() => setInfoModal({ open: true, section: item.slug })}
+                      className="text-gray-500 text-sm hover:text-white transition-colors text-left"
+                    >
+                      {item.name}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
               <h4 className="font-heading font-semibold text-sm uppercase tracking-wider text-gray-400 mb-4">Company</h4>
               <ul className="space-y-3">
-                {['About Us', 'Careers', 'Privacy Policy', 'Terms of Service'].map((item) => (
-                  <li key={item}><a href="#" className="text-gray-500 text-sm hover:text-white transition-colors">{item}</a></li>
+                {[
+                  { name: 'About Us', slug: 'about-us' },
+                  { name: 'Careers', slug: 'careers' },
+                  { name: 'Privacy Policy', slug: 'privacy-policy' },
+                  { name: 'Terms of Service', slug: 'terms-of-service' }
+                ].map((item) => (
+                  <li key={item.name}>
+                    <button 
+                      onClick={() => setInfoModal({ open: true, section: item.slug })}
+                      className="text-gray-500 text-sm hover:text-white transition-colors text-left"
+                    >
+                      {item.name}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -841,6 +881,12 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <InfoModal 
+        isOpen={infoModal.open} 
+        onClose={() => setInfoModal({ ...infoModal, open: false })} 
+        section={infoModal.section} 
+      />
     </div>
   )
 }
