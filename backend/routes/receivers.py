@@ -41,12 +41,14 @@ async def create_receiver(req: ReceiverCreate):
         raise HTTPException(status_code=400, detail="Invalid leader session")
         
     try:
+        import uuid
+        r_id = str(uuid.uuid4())
         db_execute(
             """INSERT INTO leader_receivers 
-               (leader_id, receiver_name, receiver_phone, receiver_email, receiver_type, language, state, district, has_whatsapp, is_app_user) 
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+               (id, leader_id, receiver_name, receiver_phone, receiver_email, receiver_type, language, state, district, has_whatsapp, is_app_user) 
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
             (
-                req.leader_id, req.receiver_name, req.receiver_phone, req.receiver_email, 
+                r_id, req.leader_id, req.receiver_name, req.receiver_phone, req.receiver_email, 
                 req.receiver_type, req.language, req.state, req.district, req.has_whatsapp, req.is_app_user
             ),
             commit=True

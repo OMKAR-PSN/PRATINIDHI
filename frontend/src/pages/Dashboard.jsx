@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import StatCard from '../components/StatCard'
-import { Video, Languages, Users, MessageSquare, Clock, ChevronRight, Globe, Shield, Sparkles } from 'lucide-react'
+import { Video, Users, MessageSquare, Clock, ChevronRight, Shield, Sparkles } from 'lucide-react'
+import IndicTranslationIcon from '../components/IndicTranslationIcon'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +28,7 @@ export default function Dashboard() {
   const currentRole = roleConfig[role] || roleConfig.admin
 
   const [recentMessages, setRecentMessages] = useState([])
-  const leaderId = localStorage.getItem('leaderId') || 'admin'
+  const leaderId = localStorage.getItem('leader_id') || localStorage.getItem('leaderId') || 'admin'
 
   useEffect(() => {
     getMessageHistory(leaderId, i18n.language)
@@ -61,7 +62,7 @@ export default function Dashboard() {
               className="px-5 py-2.5 rounded-xl gradient-primary text-white font-semibold text-sm flex items-center gap-2 hover:shadow-xl hover:shadow-blue-500/25 transition-all btn-press"
             >
               <Sparkles className="w-4 h-4" />
-              Create Avatar
+              {t('dash_create', 'Create Avatar')}
             </Link>
           </div>
         </div>
@@ -69,7 +70,7 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard icon={Video} title={t('dash_avatars', 'Total Avatars Generated')} value="1,247" change="+12%" changeType="up" color="blue" />
-          <StatCard icon={Languages} title={t('dash_langs', 'Languages Used')} value="18" change="+3" changeType="up" color="saffron" />
+          <StatCard icon={IndicTranslationIcon} title={t('dash_langs', 'Languages Used')} value="18" change="+3" changeType="up" color="saffron" />
           <StatCard icon={Users} title={t('dash_citizens', 'Citizens Reached')} value="2.4M" change="+8.2%" changeType="up" color="green" />
           <StatCard icon={MessageSquare} title={t('dash_msgs', 'Messages Delivered')} value="3,891" change="+15%" changeType="up" color="purple" />
         </div>
@@ -83,22 +84,22 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="divide-y divide-gray-50/50">
-            {recentMessages.map((item, i) => (
+            {(recentMessages.length > 0 ? recentMessages : recentAnnouncements).map((item, i) => (
               <div key={item.id} className="px-6 py-4 flex items-center justify-between hover:bg-white/50 transition-all animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
                     <Video className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.display_text || item.message_text}</p>
+                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.display_text || item.message_text || item.title}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="badge-lang text-[10px] font-bold px-2 py-0.5 rounded-full capitalize">{item.target_language || 'Hindi'}</span>
+                      <span className="badge-lang text-[10px] font-bold px-2 py-0.5 rounded-full capitalize">{item.target_language || item.lang || 'Hindi'}</span>
                       <span className="text-xs text-gray-300">•</span>
-                      <span className="flex items-center gap-1 text-xs text-gray-400"><Clock className="w-3 h-3" /> {new Date(item.created_at).toLocaleString()}</span>
+                      <span className="flex items-center gap-1 text-xs text-gray-400"><Clock className="w-3 h-3" /> {item.created_at ? new Date(item.created_at).toLocaleString() : item.date}</span>
                     </div>
                   </div>
                 </div>
-                <span className={`text-[11px] font-semibold px-3 py-1 rounded-full bg-emerald-50/80 text-emerald-600`}>Delivered</span>
+                <span className={`text-[11px] font-semibold px-3 py-1 rounded-full ${item.status === 'Processing' ? 'bg-saffron-50/80 text-saffron-600' : 'bg-emerald-50/80 text-emerald-600'}`}>{item.status || 'Delivered'}</span>
               </div>
             ))}
           </div>

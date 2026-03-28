@@ -1,0 +1,6 @@
+RealDictRow({'id': '565c3ac9-f8ac-47b2-a34f-17a020418327', 'receiver_name': 'aryan dalvi', 'language': 'marathi'})
+RealDictRow({'id': '116e11ab-ee93-43d2-ace2-9b0d4edc295a', 'receiver_name': 'omkar nikam ', 'language': 'hindi'})
+RealDictRow({'id': '147d7fbe-c00a-461d-878a-4ec6b8f5f61a', 'receiver_name': 'Rohit Shetty', 'language': 'Hindi'})
+RealDictRow({'id': 'a7a3425d-e733-455f-8cb9-3a06676dc9b3', 'receiver_name': 'OMKAR NIKAM', 'language': 'marathi'})
+RealDictRow({'id': 'b8fef7b1-16bf-49f7-bc3e-6c358948c587', 'receiver_name': 'Aryan R. Dalvi', 'language': 'hindi'})
+RealDictRow({'id': 'a129eb14-6e6c-4f7a-84e6-b842405a5827', 'receiver_name': 'Twilio Test Target', 'language': 'mr'})

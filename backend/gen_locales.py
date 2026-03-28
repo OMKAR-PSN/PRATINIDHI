@@ -11,6 +11,9 @@ UI_STRINGS = {
     "nav_receivers": "Citizen Receivers",
     "nav_ask": "Ask Avatar",
     "nav_settings": "Settings",
+    "nav_broadcast": "Admin Broadcast",
+    "nav_live_qa": "Live Q&A",
+    "nav_platform_analytics": "Platform Analytics",
     
     # (Settings)
     "set_title": "Settings",

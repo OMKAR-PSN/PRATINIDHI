@@ -1,0 +1,140 @@
+SID: SM15c64ac4112bdad9bca47c8e725b73b6
+To: +919970875815
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MMb8fc997501f5a7e5b69dccb8459ea9a3
+To: whatsapp:+919970875815
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM31ef85ffb82e737a81a8f21e73947e45
+To: +918767149902
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM9acc93e2b976d05a3c6a03066ef01c3c
+To: whatsapp:+918767149902
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM049333112b502f9dbef4b4ab435a46f3
+To: +918600504551
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM61fa76f76afc1c0bab423adcaf2d5429
+To: whatsapp:+918600504551
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM11479440ffd7604bd898d9bd0adc3436
+To: whatsapp:+918600504551
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM4e9786c4c3ac3e0b0c97bf115652ecc5
+To: +918600504551
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM5f8634d6b974c0f72548e8952fe427d0
+To: +919970875815
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM00f273abf96422d5f53a848d66012032
+To: whatsapp:+919970875815
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM0625007f27e5e548a1aa269e40be3358
+To: +918767149902
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MMa114969d416338fa9949bbe2860d92a9
+To: whatsapp:+918767149902
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM209b891cf05b3209aa2d6d8c31c4744f
+To: +918600504551
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM0158ac3787f6c107809bced6ebc5dda0
+To: whatsapp:+918600504551
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SMe20c9defc3bb62c7f3586b108542e8ba
+To: +918600504551
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MMa502733cf166571dd50255da34453ec4
+To: whatsapp:+918600504551
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM810676c33a3b7b3e8a06e46ba438b1d9
+To: +919970875815
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM7a30e7894786b0bd11a7ff5b80d84209
+To: whatsapp:+919970875815
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: SM74abb3c308677095101bf326505566e7
+To: +918767149902
+From: +12543234820
+Status: failed
+Error Code: 63038
+Error Message: None
+--------------------
+SID: MM7b992e47efa46776950e5ee15b5837de
+To: whatsapp:+918767149902
+From: whatsapp:+14155238886
+Status: failed
+Error Code: 63015
+Error Message: None
+--------------------

@@ -1,0 +1,89 @@
+============================================================
+Message ID: 5bbbe387-24e3-4758-b675-fc24f4137cb8
+Sent: 0, Failed: 3
+Created At: 2026-03-25 09:38:13.540793
+Text: pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  No recipient records found.
+============================================================
+Message ID: 6b56b30e-6770-431e-8536-b0884057a386
+Sent: 3, Failed: 0
+Created At: 2026-03-24 08:33:44.089056
+Text: pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  Recip ID: 565c3ac9-f8ac-47b2-a34f-17a020418327 | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 116e11ab-ee93-43d2-ace2-9b0d4edc295a | Email: failed | WA: sent | SMS: sent
+    Error: Email: Request failed: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+  Recip ID: 147d7fbe-c00a-461d-878a-4ec6b8f5f61a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+
+
+============================================================
+Message ID: 95d6fbd4-8f80-43d8-a4ce-7070f4e86590
+Sent: 3, Failed: 0
+Created At: 2026-03-23 17:38:18.284697
+Text:  pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  Recip ID: 565c3ac9-f8ac-47b2-a34f-17a020418327 | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 116e11ab-ee93-43d2-ace2-9b0d4edc295a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 147d7fbe-c00a-461d-878a-4ec6b8f5f61a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+
+
+============================================================
+Message ID: dd243947-c3c6-486f-8bd6-b61634094467
+Sent: 3, Failed: 0
+Created At: 2026-03-23 16:35:28.145912
+Text: Notice , pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  Recip ID: 565c3ac9-f8ac-47b2-a34f-17a020418327 | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 116e11ab-ee93-43d2-ace2-9b0d4edc295a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 147d7fbe-c00a-461d-878a-4ec6b8f5f61a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+
+
+============================================================
+Message ID: d9e89630-9cc8-4b5f-b13f-94071838bb9a
+Sent: 3, Failed: 0
+Created At: 2026-03-23 16:28:55.130922
+Text: Notice , pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  Recip ID: 565c3ac9-f8ac-47b2-a34f-17a020418327 | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 116e11ab-ee93-43d2-ace2-9b0d4edc295a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 147d7fbe-c00a-461d-878a-4ec6b8f5f61a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+
+
+============================================================
+Message ID: bfbcf83c-fd80-49ca-acde-98adb0fb4f69
+Sent: 2, Failed: 0
+Created At: 2026-03-22 10:00:55.599926
+Text: updates pradhan mantri ayushman yojana registration has been started....
+------------------------------
+  Recip ID: 565c3ac9-f8ac-47b2-a34f-17a020418327 | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+  Recip ID: 116e11ab-ee93-43d2-ace2-9b0d4edc295a | Email: failed | WA: sent | SMS: sent
+    Error: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+
+
+============================================================
+Message ID: c638aae5-60b1-4d24-958e-fda121f1b460
+Sent: 0, Failed: 0
+Created At: 2026-03-22 08:02:57.950083
+Text: updates pradhan mantri ayushman yojana registration has been started. ...
+------------------------------
+  No recipient records found.
+============================================================
+Message ID: 950cbcec-1f14-4636-a16b-0caa5af6c6e6
+Sent: 0, Failed: 0
+Created At: 2026-03-22 07:51:31.471391
+Text: PM Kisan scheme registration is now open. All eligible farmers can register through the government p...
+------------------------------
+  No recipient records found.

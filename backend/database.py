@@ -24,40 +24,40 @@ REDIS_URL = os.getenv("REDIS_URL")
 try:
     if DATABASE_URL:
         neon_pool = SimpleConnectionPool(1, 10, DATABASE_URL)
-        print("✅ Neon PostgreSQL initialized")
+        print("Neon PostgreSQL initialized")
     else:
         neon_pool = None
-        print("⚠️ Neon PostgreSQL URL not set")
+        print("Warning: Neon PostgreSQL URL not set")
 except Exception as e:
     neon_pool = None
-    print(f"⚠️ Neon PostgreSQL init failed: {e}")
+    print(f"Warning: Neon PostgreSQL init failed: {e}")
 
 # MongoDB Atlas Client
 try:
     if MONGO_URL:
         mongo_client = AsyncIOMotorClient(MONGO_URL)
         mongo_db = mongo_client["avatargov"]
-        print("✅ MongoDB Atlas initialized")
+        print("MongoDB Atlas initialized")
     else:
         mongo_client = None
         mongo_db = None
-        print("⚠️ MongoDB URL not set")
+        print("Warning: MongoDB URL not set")
 except Exception as e:
     mongo_client = None
     mongo_db = None
-    print(f"⚠️ MongoDB Atlas init failed: {e}")
+    print(f"Warning: MongoDB Atlas init failed: {e}")
 
 # Redis Client
 try:
     if REDIS_URL:
         redis_client = redis.from_url(REDIS_URL, decode_responses=True)
-        print("✅ Redis initialized")
+        print("Redis initialized")
     else:
         redis_client = None
-        print("⚠️ Redis URL not set")
+        print("Warning: Redis URL not set")
 except Exception as e:
     redis_client = None
-    print(f"⚠️ Redis init failed: {e}")
+    print(f"Warning: Redis init failed: {e}")
 
 
 # ==================== NEON (POSTGRES) HELPERS ====================
@@ -65,31 +65,64 @@ except Exception as e:
 def db_execute(query: str, params: tuple = None, fetchone=False, fetchall=False, commit=False):
     """
     Helper function to safely execute parameterized SQL queries on Neon PostgreSQL.
+    Retries once with a fresh connection if the pool returns a stale/closed connection.
     """
     if not neon_pool:
         raise Exception("Neon Database is not configured")
-        
-    conn = neon_pool.getconn()
-    try:
+
+    import psycopg2
+
+    def _run(conn):
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(query, params)
-            
             result = None
             if fetchone:
                 result = cur.fetchone()
             elif fetchall:
                 result = cur.fetchall()
-                
             if commit:
                 conn.commit()
-            
             return result
+
+    conn = neon_pool.getconn()
+    returned = False  # track whether we already put the conn back
+    try:
+        return _run(conn)
+    except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+        # Stale connection — discard it and get a fresh one
+        print(f"[DB] Stale connection detected ({e}), retrying with fresh connection...")
+        try:
+            neon_pool.putconn(conn, close=True)
+            returned = True
+        except Exception:
+            pass
+        conn = neon_pool.getconn()
+        returned = False
+        try:
+            result = _run(conn)
+            neon_pool.putconn(conn)
+            returned = True
+            return result
+        except Exception as e2:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            print(f"Database error (retry): {e2}")
+            raise
     except Exception as e:
-        conn.rollback()
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         print(f"Database error: {e}")
         raise
     finally:
-        neon_pool.putconn(conn)
+        if not returned:
+            try:
+                neon_pool.putconn(conn)
+            except Exception:
+                pass
 
 def log_audit(leader_id: str, action: str, metadata: dict = None):
     """
@@ -200,22 +233,33 @@ def test_connections():
         try:
             res = db_execute("SELECT 1 as is_alive", fetchone=True)
             if res and res['is_alive'] == 1:
-                print("✅ Neon PostgreSQL connection OK")
+                print("Neon PostgreSQL connection OK")
             else:
-                print("⚠️ Neon PostgreSQL connection returned unexpected result")
+                print("Warning: Neon PostgreSQL connection returned unexpected result")
         except Exception as e:
-            print(f"⚠️ Neon PostgreSQL connection failed: {e}")
+            print(f"Warning: Neon PostgreSQL connection failed: {e}")
             
     # 2. Redis Test
     if redis_client:
         try:
             if ping_redis():
-                print("✅ Redis connection OK")
+                print("Redis connection OK")
         except Exception as e:
-            print(f"⚠️ Redis connection failed: {e}")
+            print(f"Warning: Redis connection failed: {e}")
             
-    # 3. MongoDB Client Check
-    if mongo_client:
-        print("✅ MongoDB client ready")
-        
-    print("🚀 Database connection check complete")
+    # 4. Schema Sync
+    try:
+        db_execute("""
+            CREATE TABLE IF NOT EXISTS citizen_devices (
+                device_token TEXT PRIMARY KEY,
+                state TEXT,
+                pincode TEXT,
+                language TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """, commit=True)
+        print("✅ citizen_devices table verified")
+    except Exception as e:
+        print(f"⚠️  Database schema sync failed: {e}")
+
+    print("Database connection check complete")

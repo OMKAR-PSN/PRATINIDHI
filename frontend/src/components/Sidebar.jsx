@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, UserPlus, MessageSquare, BarChart3, Settings,
-  LogOut, Globe, ChevronLeft, ChevronRight, HelpCircle, Shield, Users
+  LogOut, Globe, ChevronLeft, ChevronRight, HelpCircle, Shield, Layers,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Users } from 'lucide-react'
 
 const allNavItems = [
   { icon: LayoutDashboard, labelKey: 'nav_dashboard', path: '/dashboard', roles: ['all'] },
@@ -15,6 +16,7 @@ const allNavItems = [
   { icon: BarChart3, labelKey: 'nav_analytics', path: '/analytics', roles: ['admin', 'mp', 'mla'] },
   { icon: Settings, labelKey: 'nav_settings', path: '/settings', roles: ['all'] },
 ]
+
 
 const roleConfig = {
   admin: { label: 'Institution Admin', color: 'from-blue-600 to-blue-800', badge: 'bg-blue-100 text-blue-700' },
@@ -31,23 +33,6 @@ export default function Sidebar() {
   const [unreadCount, setUnreadCount] = useState(0)
   const role = localStorage.getItem('userRole') || 'admin'
   const rc = roleConfig[role] || roleConfig.admin
-
-  // Polling for unread messages
-  useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        const leaderId = localStorage.getItem('leaderId')
-        if (!leaderId) return
-        const res = await fetch(`/api/messages/unread?leader_id=${leaderId}`).then(r => r.json())
-        setUnreadCount(res.count || 0)
-      } catch (e) {
-        console.error("Unread fetch failed", e)
-      }
-    }
-    fetchUnread()
-    const interval = setInterval(fetchUnread, 15000)
-    return () => clearInterval(interval)
-  }, [])
 
   const navItems = allNavItems.filter(
     (item) => item.roles.includes('all') || item.roles.includes(role)
@@ -92,14 +77,14 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {navItems.map(({ icon: Icon, labelKey, path }) => {
+        {navItems.map(({ icon: Icon, labelKey, path, label }) => {
           const isActive = location.pathname === path || (path !== '/settings' && location.pathname.startsWith(path + '/'))
-          const displayLabel = t(labelKey)
+          const displayLabel = t(labelKey, label || labelKey)
           return (
             <Link
               key={path}
               to={path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group btn-press relative ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group btn-press ${
                 isActive
                   ? 'gradient-primary text-white shadow-lg shadow-blue-500/20'
                   : 'text-gray-600 hover:bg-white/60 hover:text-blue-600'
@@ -109,7 +94,7 @@ export default function Sidebar() {
               <Icon className={`w-5 h-5 min-w-[20px] transition-transform group-hover:scale-110 ${
                 isActive ? 'text-white' : 'text-gray-400 group-hover:text-blue-500'
               }`} />
-              {!collapsed && <span className="whitespace-nowrap flex-1">{displayLabel}</span>}
+              {!collapsed && <span className="whitespace-nowrap flex-1">{label || displayLabel}</span>}
               {labelKey === 'msg_title' && unreadCount > 0 && (
                 <span className={`flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full bg-red-500 text-white border-2 border-white shadow-sm ${collapsed ? 'absolute top-1 right-1' : ''}`}>
                   {unreadCount > 9 ? '9+' : unreadCount}

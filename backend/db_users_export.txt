@@ -1,0 +1,36 @@
+Found 5 leader(s):
+
+  ID:    dd144c78-ffc0-4456-b178-74c4f0425164
+  Name:  Omkar Santosh Nikam
+  Email: yashawantnikam97@gmail.com
+  Phone: 8767149902
+  Role:  admin
+  Since: 2026-03-25 07:05:27.122533
+
+  ID:    6103bc72-91e5-4483-ae01-d8abcde1b0ca
+  Name:  Aryan Dalvi
+  Email: None
+  Phone: +919876543210
+  Role:  State Leader
+  Since: 2026-03-24 13:56:51.131611
+
+  ID:    342e93d1-7d0a-451d-9d39-46bc492ee802
+  Name:  Rohit Uday Shetty
+  Email: None
+  Phone: +919876543211
+  Role:  State Leader
+  Since: 2026-03-24 13:56:51.131611
+
+  ID:    824ab769-3f56-4f45-80a3-1bf9267e78c3
+  Name:  Rohit Uday Shetty
+  Email: us7269151@gmail.com
+  Phone: 9970875815
+  Role:  admin
+  Since: 2026-03-22 12:59:15.230168
+
+  ID:    295e4c48-424a-4db2-a06f-329d2f4d4d0b
+  Name:  aryan dalvi
+  Email: aryandalvi0306@gmail.com
+  Phone: 8600504553
+  Role:  admin
+  Since: 2026-03-21 14:23:09.959603

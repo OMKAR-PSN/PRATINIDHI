@@ -13,3 +13,4 @@ python-dotenv
 resend
 cloudinary
 twilio
+httpx

@@ -1,12 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== SCROLL REVEAL ===== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.scroll-reveal[style*="animationDelay"] {
+  transition-delay: calc(var(--delay, 0s));
+}
 
 /* ===== CSS CUSTOM PROPERTIES ===== */
 :root {
   --deep-blue: #0A3D62;
   --saffron: #FF9933;
   --green: #138808;
+  --cream: #FDFBF7;
   --white: #FFFFFF;
   --off-white: #F8FAFB;
   --light-gray: #F1F5F9;
@@ -28,7 +45,7 @@ html {
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--white);
+  background: var(--cream);
   color: #1a1a2e;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -36,8 +53,8 @@ body {
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: 'Outfit', 'Poppins', sans-serif;
 }
 
 /* ===== SCROLLBAR ===== */
@@ -591,3 +608,477 @@ h1, h2, h3, h4, h5, h6 {
 .lip-sync-bar:nth-child(4) { animation-delay: 0.15s; animation-duration: 0.5s; }
 .lip-sync-bar:nth-child(5) { animation-delay: 0.05s; animation-duration: 0.3s; }
 
+
+/* ===== LIP-TALKING MOUTH ANIMATION (ENHANCED) ===== */
+
+/* Active avatar image — visible jaw/chin movement */
+.avatar-card-active .avatar-image-wrapper {
+  overflow: hidden;
+}
+.avatar-card-active .avatar-talking-face {
+  animation: faceTalk 0.5s ease-in-out infinite alternate;
+  transform-origin: center 70%;
+}
+@keyframes faceTalk {
+  0% { transform: scaleY(1) translateY(0); }
+  50% { transform: scaleY(1.003) translateY(0.5px); }
+  100% { transform: scaleY(1) translateY(0); }
+}
+
+/* Visible mouth open/close dark ellipse */
+.mouth-shadow {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  filter: blur(2px);
+  transition: opacity 0.3s ease;
+}
+.avatar-card-active .mouth-shadow {
+  opacity: 1;
+  animation: mouthOpen 0.4s ease-in-out infinite alternate;
+}
+@keyframes mouthOpen {
+  0% {
+    width: 20px;
+    height: 3px;
+    opacity: 0.15;
+  }
+  40% {
+    width: 28px;
+    height: 8px;
+    opacity: 0.4;
+  }
+  70% {
+    width: 22px;
+    height: 4px;
+    opacity: 0.2;
+  }
+  100% {
+    width: 30px;
+    height: 10px;
+    opacity: 0.45;
+  }
+}
+
+/* Jaw movement overlay */
+.avatar-jaw {
+  position: absolute;
+  bottom: 22%;
+  left: 0;
+  right: 0;
+  height: 40%;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.avatar-card-active .avatar-jaw {
+  opacity: 1;
+  animation: jawMove 0.45s ease-in-out infinite alternate;
+}
+@keyframes jawMove {
+  0% { transform: translateY(0px) scaleY(1); }
+  30% { transform: translateY(1.5px) scaleY(1.01); }
+  60% { transform: translateY(0.5px) scaleY(1); }
+  100% { transform: translateY(2px) scaleY(1.015); }
+}
+
+/* Speaking badge with bouncing dots */
+.speaking-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 153, 51, 0.9);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 12px rgba(255, 153, 51, 0.4);
+}
+.avatar-card-active .speaking-indicator {
+  opacity: 1;
+  animation: speakPulse 1.2s ease-in-out infinite;
+}
+@keyframes speakPulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.speaking-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: white;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.speaking-dot:nth-child(2) { animation-delay: 0.15s; }
+.speaking-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dotBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+/* Mic speaking ring pulse */
+.mic-speaking-ring {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+}
+.avatar-card-active .mic-speaking-ring {
+  opacity: 1;
+  animation: micRing 1.2s ease-out infinite;
+}
+@keyframes micRing {
+  0% { box-shadow: 0 0 0 0 rgba(19, 136, 8, 0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(19, 136, 8, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(19, 136, 8, 0); }
+}
+/* ===== SANGRAH SHOWCASE (Bhashini-style) ===== */
+.sangrah-section {
+  background: linear-gradient(180deg, #0A1628 0%, #0A3D62 50%, #0A1628 100%);
+  position: relative;
+  overflow: hidden;
+}
+.sangrah-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 153, 51, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(19, 136, 8, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Carousel Container */
+.sangrah-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  height: 420px;
+  perspective: 1200px;
+  overflow: visible;
+}
+
+/* Individual Card */
+.sangrah-card {
+  position: absolute;
+  width: 340px;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+.sangrah-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.sangrah-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Card positions */
+.sangrah-card[data-pos="-2"] {
+  transform: translateX(-520px) scale(0.65) rotateY(25deg);
+  opacity: 0.3;
+  z-index: 1;
+  filter: blur(2px) brightness(0.5);
+}
+.sangrah-card[data-pos="-1"] {
+  transform: translateX(-280px) scale(0.8) rotateY(15deg);
+  opacity: 0.6;
+  z-index: 2;
+  filter: brightness(0.7);
+}
+.sangrah-card[data-pos="0"] {
+  transform: translateX(0) scale(1.05) rotateY(0deg);
+  opacity: 1;
+  z-index: 5;
+  filter: none;
+  border-color: rgba(255, 153, 51, 0.5);
+  box-shadow:
+    0 0 40px rgba(255, 153, 51, 0.2),
+    0 0 80px rgba(255, 153, 51, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.sangrah-card[data-pos="1"] {
+  transform: translateX(280px) scale(0.8) rotateY(-15deg);
+  opacity: 0.6;
+  z-index: 2;
+  filter: brightness(0.7);
+}
+.sangrah-card[data-pos="2"] {
+  transform: translateX(520px) scale(0.65) rotateY(-25deg);
+  opacity: 0.3;
+  z-index: 1;
+  filter: blur(2px) brightness(0.5);
+}
+.sangrah-card[data-pos="hidden"] {
+  transform: translateX(0) scale(0.4);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Card overlay */
+.sangrah-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: rgba(10, 22, 40, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 2px solid rgba(255, 153, 51, 0.6);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.sangrah-card[data-pos="0"] .sangrah-card-overlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+.sangrah-card-overlay h3 {
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.sangrah-card-overlay p {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Card click prompt */
+.sangrah-click-hint {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 153, 51, 0.9);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 153, 51, 0.4);
+}
+.sangrah-card[data-pos="0"] .sangrah-click-hint {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Navigation Dots */
+.sangrah-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+.sangrah-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  padding: 0;
+}
+.sangrah-dot.active {
+  width: 36px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #FF9933, #ffb74d);
+  box-shadow: 0 0 16px rgba(255, 153, 51, 0.4);
+}
+
+/* ===== MODAL ===== */
+.sangrah-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: sangrahFadeIn 0.3s ease forwards;
+}
+@keyframes sangrahFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sangrah-modal {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0A1628, #0A3D62);
+  border: 1px solid rgba(255, 153, 51, 0.3);
+  box-shadow:
+    0 0 60px rgba(255, 153, 51, 0.15),
+    0 32px 80px rgba(0, 0, 0, 0.6);
+  animation: sangrahModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes sangrahModalIn {
+  from { opacity: 0; transform: scale(0.85) translateY(40px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.sangrah-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+.sangrah-modal-close:hover {
+  background: rgba(255, 153, 51, 0.8);
+  border-color: rgba(255, 153, 51, 0.9);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.sangrah-modal-img {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+  object-position: center center;
+  padding: 1.5rem;
+  background: #071020;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sangrah-modal-body {
+  padding: 32px 36px 36px;
+}
+.sangrah-modal-body h2 {
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.sangrah-modal-body p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.sangrah-modal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 153, 51, 0.15);
+  color: #ffb74d;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+/* Auto-scroll shimmer on active card */
+@keyframes sangrahShine {
+  0% { left: -40%; }
+  100% { left: 120%; }
+}
+.sangrah-card[data-pos="0"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transform: skewX(-20deg);
+  animation: sangrahShine 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .sangrah-carousel {
+    height: 320px;
+  }
+  .sangrah-card {
+    width: 240px;
+    height: 280px;
+  }
+  .sangrah-card[data-pos="-2"],
+  .sangrah-card[data-pos="2"] {
+    display: none;
+  }
+  .sangrah-card[data-pos="-1"] {
+    transform: translateX(-160px) scale(0.75) rotateY(15deg);
+  }
+  .sangrah-card[data-pos="1"] {
+    transform: translateX(160px) scale(0.75) rotateY(-15deg);
+  }
+  .sangrah-modal-img {
+    height: 250px;
+  }
+  .sangrah-modal-body {
+    padding: 24px;
+  }
+  .sangrah-modal-body h2 {
+    font-size: 22px;
+  }
+}

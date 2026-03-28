@@ -1,13 +1,25 @@
 """
 Translation Module
-Uses googletrans for translating government announcements into regional languages.
+भारत Avatar Platform — India Innovates 2026
+
+Primary: Bhashini NMT (Neural Machine Translation)
+Fallback: googletrans
 """
 
-# from googletrans import Translator
+# ─── Bhashini Translation (primary) ────────────────────
+try:
+    from bhashini import bhashini_translate, detect_language
+    BHASHINI_AVAILABLE = True
+    print("[TRANSLATE] Bhashini translation module loaded")
+except ImportError:
+    BHASHINI_AVAILABLE = False
+    print("[TRANSLATE] Warning: Bhashini module not found, using googletrans only")
+
 
 # Language code mapping for Indian languages
 LANGUAGE_MAP = {
     "hi": "Hindi",
+    "en": "English",
     "mr": "Marathi",
     "ta": "Tamil",
     "te": "Telugu",
@@ -22,48 +34,55 @@ LANGUAGE_MAP = {
 }
 
 
-def translate_text(text: str, language: str) -> str:
+def translate_text(text: str, source_lang: str = "en", target_lang: str = "hi") -> str:
     """
-    Translate text to the specified language.
+    Translate text between languages.
+    Tries Bhashini NMT first, falls back to googletrans.
 
     Args:
-        text: The original English text to translate.
-        language: Target language code (e.g., 'hi' for Hindi).
+        text: The text to translate.
+        source_lang: Source language code (e.g., 'en').
+        target_lang: Target language code (e.g., 'hi').
 
     Returns:
         Translated text string.
     """
-    try:
-        # Reverse map if full name is provided
-        language = language.lower()
-        for code, name in LANGUAGE_MAP.items():
-            if name.lower() == language:
-                language = code
-                break
-                
-        import os
-        from bhashini_translator import Bhashini
-        
-        # Ensure credentials are set for the library
-        if not os.environ.get("userID"):
-            os.environ["userID"] = os.getenv("BHASHINI_USER_ID", "")
-        if not os.environ.get("ulcaApiKey"):
-            os.environ["ulcaApiKey"] = os.getenv("BHASHINI_API_KEY", "")
-        if not os.environ.get("DefaultPipeLineId"):
-            os.environ["DefaultPipeLineId"] = os.getenv("BHASHINI_PIPELINE_ID", "64392f96daac500b55c543cd")
-            
-        b = Bhashini(sourceLanguage="en", targetLanguage=language)
-        result = b.translate(text)
-        return result
-    except Exception as e:
-        print(f"Bhashini Translation error: {e}")
-        # Secondary Fallback: deep_translator
+    # Normalize language codes from full names to short codes (e.g. "marathi" -> "mr")
+    target_lang = target_lang.lower().strip()
+    source_lang = source_lang.lower().strip()
+    reverse_map = {v.lower(): k for k, v in LANGUAGE_MAP.items()}
+    if target_lang in reverse_map:
+        target_lang = reverse_map[target_lang]
+    if source_lang in reverse_map:
+        source_lang = reverse_map[source_lang]
+
+    if source_lang == target_lang:
+        return text
+
+    # Try Bhashini first
+    if BHASHINI_AVAILABLE:
         try:
-            from deep_translator import GoogleTranslator
-            return GoogleTranslator(source='auto', target=language).translate(text)
-        except Exception as e2:
-             print(f"Deep Translator fallback failed: {e2}")
-             return f"[Translation pending - {LANGUAGE_MAP.get(language, language)}] {text}"
+            result = bhashini_translate(text, source_lang, target_lang)
+            print(f"[TRANSLATE] Bhashini: {source_lang}->{target_lang}")
+            return result
+        except Exception as e:
+            import traceback
+            with open("translation_errors.txt", "a") as err_log:
+                err_log.write(f"BHASHINI ERROR: {e}\n{traceback.format_exc()}\n")
+            print(f"[TRANSLATE] Warning: Bhashini failed: {e}, falling back to googletrans")
+
+    # Fallback: googletrans
+    try:
+        from googletrans import Translator
+        translator = Translator()
+        result = translator.translate(text, src=source_lang, dest=target_lang)
+        return result.text
+    except Exception as e:
+        import traceback
+        with open("translation_errors.txt", "a") as err_log:
+            err_log.write(f"GOOGLETRANS ERROR: {e}\n{traceback.format_exc()}\n")
+        print(f"[TRANSLATE] Error: googletrans also failed: {e}")
+        return f"[Translation pending - {LANGUAGE_MAP.get(target_lang, target_lang)}] {text}"
 
 
 def get_supported_languages() -> dict:
@@ -74,6 +93,6 @@ def get_supported_languages() -> dict:
 if __name__ == "__main__":
     # Quick test
     test_text = "PM Kisan scheme registration is now open."
-    for lang_code in ["hi", "mr", "ta", "te"]:
-        translated = translate_text(test_text, lang_code)
+    for lang_code in ["hi", "mr", "ta", "bn"]:
+        translated = translate_text(test_text, "en", lang_code)
         print(f"{LANGUAGE_MAP[lang_code]}: {translated}")

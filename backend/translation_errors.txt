@@ -1,0 +1,102 @@
+BHASHINI ERROR: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 115, in _get_pipeline_config
+    resp.raise_for_status()
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 56, in translate_text
+    result = bhashini_translate(text, source_lang, target_lang)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 173, in bhashini_translate
+    config = _get_pipeline_config("translation", src, tgt)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 147, in _get_pipeline_config
+    raise RuntimeError(f"Bhashini config failed: {e}")
+RuntimeError: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+GOOGLETRANS ERROR: module 'httpcore' has no attribute 'SyncHTTPTransport'
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 67, in translate_text
+    from googletrans import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\__init__.py", line 6, in <module>
+    from googletrans.client import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 30, in <module>
+    class Translator:
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 62, in Translator
+    proxies: typing.Dict[str, httpcore.SyncHTTPTransport] = None,
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'httpcore' has no attribute 'SyncHTTPTransport'
+
+BHASHINI ERROR: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 115, in _get_pipeline_config
+    resp.raise_for_status()
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 56, in translate_text
+    result = bhashini_translate(text, source_lang, target_lang)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 173, in bhashini_translate
+    config = _get_pipeline_config("translation", src, tgt)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 147, in _get_pipeline_config
+    raise RuntimeError(f"Bhashini config failed: {e}")
+RuntimeError: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+GOOGLETRANS ERROR: module 'httpcore' has no attribute 'SyncHTTPTransport'
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 67, in translate_text
+    from googletrans import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\__init__.py", line 6, in <module>
+    from googletrans.client import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 30, in <module>
+    class Translator:
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 62, in Translator
+    proxies: typing.Dict[str, httpcore.SyncHTTPTransport] = None,
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'httpcore' has no attribute 'SyncHTTPTransport'
+
+BHASHINI ERROR: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 115, in _get_pipeline_config
+    resp.raise_for_status()
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 56, in translate_text
+    result = bhashini_translate(text, source_lang, target_lang)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 173, in bhashini_translate
+    config = _get_pipeline_config("translation", src, tgt)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\bhashini.py", line 147, in _get_pipeline_config
+    raise RuntimeError(f"Bhashini config failed: {e}")
+RuntimeError: Bhashini config failed: 400 Client Error:  for url: https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline
+
+GOOGLETRANS ERROR: module 'httpcore' has no attribute 'SyncHTTPTransport'
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\translate.py", line 67, in translate_text
+    from googletrans import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\__init__.py", line 6, in <module>
+    from googletrans.client import Translator
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 30, in <module>
+    class Translator:
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\googletrans\client.py", line 62, in Translator
+    proxies: typing.Dict[str, httpcore.SyncHTTPTransport] = None,
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'httpcore' has no attribute 'SyncHTTPTransport'
+

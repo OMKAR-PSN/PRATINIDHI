@@ -65,7 +65,8 @@ export default function SignUpPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/auth/signup', {
+      const apiBase = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${apiBase}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, password, security_pin: securityPin, role, face_image: capturedImage })
@@ -92,28 +93,28 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-hero relative overflow-hidden flex-col items-center justify-center p-12">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-saffron-500/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-saffron-400/20 to-transparent" />
-        </div>
-        <div className="relative text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-lg">
-            <Globe className="w-8 h-8 text-white" />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#F5F0E1] p-12 items-center justify-center">
+        {/* Brand Logo Overlay */}
+        <div className="absolute top-8 left-8 flex items-center gap-3 z-20">
+          <div className="flex items-center justify-center relative w-12 h-12 min-w-[48px]">
+            <div className="absolute inset-0 rounded-full border-[2.5px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-lg" />
+            <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <h1 className="font-heading text-4xl font-bold text-white tracking-tight">Prati<span className="text-saffron-400">nidhi</span> AI</h1>
-          <p className="text-white/50 mt-3 text-lg max-w-md">Create your account and join the AI-powered governance communication platform.</p>
-          <div className="mt-12 flex flex-wrap justify-center gap-3">
-            {['22+ Languages', 'Multi-Method Consent', 'Secure Authentication'].map((tag) => (
-              <span key={tag} className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 text-sm text-white/60 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-saffron-400" />
-                {tag}
-              </span>
-            ))}
+          <div className="flex items-baseline">
+            <span className="font-heading font-extrabold text-2xl tracking-tight text-gray-900 drop-shadow-sm">
+              PRATI<span className="text-saffron-600">NIDHI</span>
+            </span>
+            <span className="text-primary-700 text-[10px] uppercase ml-1 align-top tracking-widest font-bold">AI</span>
           </div>
         </div>
+
+        <img
+          src="/janavatar-hero.png"
+          alt="JanAvatar AI Platform"
+          className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700"
+        />
       </div>
 
       {/* Right panel */}
@@ -176,7 +177,7 @@ export default function SignUpPage() {
                 <label className="block text-sm font-semibold text-gray-700">6-Digit Backup PIN</label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input type="text" maxLength={6} value={securityPin} onChange={(e) => setSecurityPin(e.target.value.replace(/\D/g, ''))} placeholder="123456" className="w-full pl-11 pr-4 py-3 glass-card rounded-xl text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 tracking-widest transition-all outline-none border border-gray-200/50" required />
+                  <input type="password" maxLength={6} value={securityPin} onChange={(e) => setSecurityPin(e.target.value.replace(/\D/g, ''))} placeholder="123456" className="w-full pl-11 pr-4 py-3 glass-card rounded-xl text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 tracking-widest transition-all outline-none border border-gray-200/50" required />
                 </div>
                 <p className="text-xs text-gray-400 ml-1">This PIN acts as a secure backup to Biometric Consent</p>
               </div>

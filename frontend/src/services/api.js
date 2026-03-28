@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const BASE_URL = import.meta.env.VITE_API_URL || ''
+
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: `${BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -109,4 +111,38 @@ export const uploadReceivers = async (leaderId, file) => {
   })
 }
 
+// ==================== Avatar Generation ====================
+
+const avatarAuthHeader = (leaderId) => ({
+  headers: { Authorization: `Bearer leader:${leaderId}` }
+})
+
+export const getReceiverLanguages = (leaderId) =>
+  API.get('/avatar/receiver-languages', avatarAuthHeader(leaderId))
+
+export const generateAvatarVideos = (leaderId, data) =>
+  API.post('/avatar/generate', data, avatarAuthHeader(leaderId))
+
+export const getMyAvatarVideos = (leaderId, params = {}) =>
+  API.get('/avatar/my-videos', {
+    ...avatarAuthHeader(leaderId),
+    params,
+  })
+
+export const getPublicAvatarVideos = (params = {}) =>
+  API.get('/avatar/public', { params })
+
+export const toggleAvatarVideoPublic = (leaderId, videoId) =>
+  API.patch(`/avatar/${videoId}/toggle-public`, {}, avatarAuthHeader(leaderId))
+
+export const deleteAvatarVideo = (leaderId, videoId) =>
+  API.delete(`/avatar/${videoId}`, avatarAuthHeader(leaderId))
+
+export const getAvatarVideoById = (videoId) =>
+  API.get(`/avatar/${videoId}`)
+
+export const registerModalUrl = (url) =>
+  API.post('/avatar/register-url', { url })
+
 export default API
+

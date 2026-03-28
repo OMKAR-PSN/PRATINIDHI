@@ -14,6 +14,8 @@ import MessagePreview from './pages/MessagePreview'
 import ConsentOTP from './pages/ConsentOTP'
 import ConsentVerify from './pages/ConsentVerify'
 import Receivers from './pages/Receivers'
+import GenerateAvatar from './pages/GenerateAvatar'
+import MyVideos from './pages/MyVideos'
 
 function App() {
   return (
@@ -35,9 +37,13 @@ function App() {
         <Route path="/consent/verify" element={<ConsentVerify />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/ask-avatar" element={<AskAvatar />} />
+        {/* Avatar Generation Routes */}
+        <Route path="/dashboard/generate-avatar" element={<GenerateAvatar />} />
+        <Route path="/dashboard/my-videos" element={<MyVideos />} />
       </Routes>
     </Router>
   )
 }
 
 export default App
+

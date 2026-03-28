@@ -1,0 +1,54 @@
+--- Schema for table: messages ---
+  id | uuid | Nullable: NO
+  sender_id | uuid | Nullable: YES
+  message_text | text | Nullable: NO
+  original_language | text | Nullable: YES
+  created_at | timestamp without time zone | Nullable: YES
+  total_receivers | integer | Nullable: YES
+  sent_count | integer | Nullable: YES
+  failed_count | integer | Nullable: YES
+  completed_at | timestamp without time zone | Nullable: YES
+  avatar_id | text | Nullable: YES
+  video_path | text | Nullable: YES
+  status | text | Nullable: YES
+
+
+--- Schema for table: message_recipients ---
+  id | uuid | Nullable: NO
+  message_id | uuid | Nullable: YES
+  receiver_id | uuid | Nullable: YES
+  translated_text | text | Nullable: YES
+  sms_status | text | Nullable: YES
+  email_status | text | Nullable: YES
+  whatsapp_status | text | Nullable: YES
+  is_read | boolean | Nullable: YES
+  read_at | timestamp without time zone | Nullable: YES
+  delivered_at | timestamp without time zone | Nullable: YES
+  error_reason | text | Nullable: YES
+
+
+--- Schema for table: message_translations ---
+  id | uuid | Nullable: NO
+  message_id | uuid | Nullable: YES
+  language | text | Nullable: NO
+  translated_text | text | Nullable: YES
+  audio_url | text | Nullable: YES
+  video_url | text | Nullable: YES
+  created_at | timestamp without time zone | Nullable: YES
+
+
+--- Schema for table: leader_receivers ---
+  id | uuid | Nullable: NO
+  leader_id | uuid | Nullable: YES
+  receiver_name | text | Nullable: NO
+  receiver_phone | text | Nullable: YES
+  receiver_email | text | Nullable: YES
+  receiver_type | text | Nullable: YES
+  language | text | Nullable: YES
+  state | text | Nullable: YES
+  district | text | Nullable: YES
+  has_whatsapp | boolean | Nullable: YES
+  is_app_user | boolean | Nullable: YES
+  app_user_id | uuid | Nullable: YES
+  created_at | timestamp without time zone | Nullable: YES
+

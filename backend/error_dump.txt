@@ -1,0 +1,20 @@
+Phone: 9970875815
+WA: sent
+SMS: sent
+ERROR: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+------
+Phone: 8600504551
+WA: sent
+SMS: sent
+ERROR: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+------
+Phone: 8767149902
+WA: sent
+SMS: sent
+ERROR: Email: Request failed: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+------
+Phone: 8600504551
+WA: sent
+SMS: sent
+ERROR: Email: You can only send testing emails to your own email address (work.aryandalvi1@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.
+------

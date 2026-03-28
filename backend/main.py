@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+print("!!! ROOT MAIN LOADED !!!")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -12,15 +13,36 @@ import cloudinary
 import cloudinary.uploader
 
 from translate import translate_text
-from tts import generate_speech
+from tts import text_to_audio as generate_speech
 from asr import transcribe_audio_bhashini
 from avatar import generate_avatar_video
 from utils import ensure_dirs, get_video_path, get_audio_path
 
 from database import test_connections, redis_client, db_execute
-from routes import consent, health, auth, receivers, videos
+from routes import consent, health, auth, receivers, videos, avatar_routes
+import json
 import notifications
-from signing import sign_video
+import firebase_admin
+from firebase_admin import credentials, messaging
+
+# Initialize Firebase Admin SDK safely
+firebase_path = "c:/Users/Omkar/Downloads/pratinidhi-bbe4b-firebase-adminsdk-fbsvc-11a6b51761.json"
+firebase_env = os.getenv("FIREBASE_JSON")
+
+try:
+    cred = None
+    if firebase_env:
+        cred = credentials.Certificate(json.loads(firebase_env))
+    elif os.path.exists(firebase_path):
+        cred = credentials.Certificate(firebase_path)
+        
+    if cred:
+        firebase_admin.initialize_app(cred)
+        print("✅ Firebase Admin successfully initialized")
+    else:
+        print("⚠️ Firebase Admin credentials not found!")
+except Exception as e:
+    print(f"⚠️ Firebase Admin init failed: {e}")
 
 app = FastAPI(
     title="Pratinidhi AI",
@@ -39,14 +61,27 @@ app.add_middleware(
 ensure_dirs()
 test_connections()
 
+# Constants for paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
+AUDIO_DIR = os.path.join(OUTPUT_DIR, "audio")
+VIDEO_DIR = os.path.join(OUTPUT_DIR, "videos")
+AVATARS_DIR = os.path.join(PROJECT_ROOT, "avatars")
+
+os.makedirs(AUDIO_DIR, exist_ok=True)
+os.makedirs(VIDEO_DIR, exist_ok=True)
+os.makedirs(AVATARS_DIR, exist_ok=True)
+
 app.include_router(consent.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(receivers.router, prefix="/api")
 app.include_router(videos.router, prefix="/api")
+app.include_router(avatar_routes.router, prefix="/api")
 
-app.mount("/output", StaticFiles(directory="../output"), name="output")
-app.mount("/avatars", StaticFiles(directory="../avatars"), name="avatars")
+app.mount("/output", StaticFiles(directory=OUTPUT_DIR), name="output")
+app.mount("/avatars", StaticFiles(directory=AVATARS_DIR), name="avatars")
 
 # In-memory storage
 avatars_db = {}
@@ -63,9 +98,16 @@ import hashlib as _hashlib
 class MCCCheckRequest(BaseModel):
     message: str
 
+class DeviceRegistration(BaseModel):
+    token: str
+    state: str
+    pincode: str = None
+    language: str = "english"
+
 class PreviewRequest(BaseModel):
     text: str
     language: str
+    avatar: str = 'arjun'
 
 class RAGAskRequest(BaseModel):
     question: str
@@ -82,12 +124,8 @@ class BroadcastRequest(BaseModel):
     message: str
     translated_text: str
     language: str
-
-class BroadcastRequest(BaseModel):
-    leader_id: str
-    message: str
-    translated_text: str
-    language: str
+    avatar: str = 'arjun'
+    video_metadata: list = []
 
 
 # ==================== Core Endpoints ====================
@@ -103,7 +141,7 @@ async def upload_image(image: UploadFile = File(...)):
         raise HTTPException(400, "File must be an image")
     file_ext = os.path.splitext(image.filename)[1]
     filename = f"{uuid.uuid4().hex}{file_ext}"
-    filepath = os.path.join("..", "avatars", filename)
+    filepath = os.path.join(AVATARS_DIR, filename)
     with open(filepath, "wb") as f:
         f.write(await image.read())
     return {"filename": filename, "path": filepath}
@@ -118,7 +156,7 @@ async def process_audio_asr(
     
     file_ext = os.path.splitext(audio.filename)[1] or ".m4a"
     filename = f"asr_{uuid.uuid4().hex}{file_ext}"
-    filepath = os.path.join("..", "output", "audio", filename)
+    filepath = os.path.join(AUDIO_DIR, filename)
     
     with open(filepath, "wb") as f:
         f.write(await audio.read())
@@ -128,7 +166,7 @@ async def process_audio_asr(
     return {"transcript": transcript, "language": language}
 
 
-@app.post("/api/avatar/generate")
+@app.post("/api/avatar/generate-legacy")
 async def create_avatar(
     image: UploadFile = File(...),
     message: str = Form(...),
@@ -161,11 +199,11 @@ async def create_avatar(
     avatar_id = uuid.uuid4().hex[:12]
     try:
         file_ext = os.path.splitext(image.filename)[1] or ".jpg"
-        image_path = os.path.join("..", "avatars", f"{avatar_id}{file_ext}")
+        image_path = os.path.join(AVATARS_DIR, f"{avatar_id}{file_ext}")
         with open(image_path, "wb") as f:
             f.write(await image.read())
 
-        translated = translate_text(message, language)
+        translated = translate_text(message, target_lang=language)
         audio_path = get_audio_path(avatar_id)
         generate_speech(translated, language, audio_path)
 
@@ -228,10 +266,13 @@ async def create_avatar(
 @app.post("/api/preview/translate")
 async def preview_translate(req: PreviewRequest):
     try:
-        translated = translate_text(req.text, req.language)
+        translated = translate_text(req.text, target_lang=req.language)
         filename = f"preview_{uuid.uuid4().hex[:8]}.mp3"
-        audio_path = os.path.join("..", "output", "audio", filename)
-        generate_speech(translated, req.language, audio_path)
+        audio_path = os.path.join(AUDIO_DIR, filename)
+        # Derive gender from avatar name for correct voice
+        avatar_name = req.avatar.lower() if req.avatar else 'arjun'
+        gender = "female" if avatar_name in ["priya", "asha"] else "male"
+        generate_speech(translated, req.language, audio_path, gender=gender)
         return {
             "translated_text": translated,
             "audio_url": f"/output/audio/{filename}"
@@ -247,26 +288,82 @@ async def get_unread_count(leader_id: str):
     count = redis_client.get(f"unread:{leader_id}")
     return {"count": int(count) if count else 0}
 
+# ==================== FCM Push Notifications ====================
+
+@app.post("/api/notifications/register")
+async def register_device(device: DeviceRegistration):
+    try:
+        db_execute(
+            """
+            INSERT INTO citizen_devices (device_token, state, pincode, language) 
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (device_token) 
+            DO UPDATE SET state = EXCLUDED.state, pincode = EXCLUDED.pincode, language = EXCLUDED.language
+            """,
+            (device.token, device.state, device.pincode, device.language),
+            commit=True
+        )
+        return {"success": True, "message": "Device registered for notifications"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def broadcast_push_notification(state: str, title: str, body: str):
+    """Sends a push notification to all devices registered in a specific state."""
+    try:
+        devices = db_execute("SELECT device_token FROM citizen_devices WHERE state = %s", (state,), fetchall=True)
+        if not devices:
+            return 0
+            
+        tokens = [d["device_token"] for d in devices]
+        
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            tokens=tokens,
+        )
+        
+        response = messaging.send_each_for_multicast(message)
+        print(f"FCM: Successfully sent {response.success_count} messages. Failed: {response.failure_count}")
+        return response.success_count
+    except Exception as e:
+        print(f"⚠️ FCM Broadcast failed: {e}")
+        return 0
+
 @app.post("/api/messages/send")
 async def send_message(req: BroadcastRequest):
-    if not req.leader_id or req.leader_id == "admin":
-        raise HTTPException(status_code=400, detail="Invalid leader session")
+    import uuid
+    try:
+        uuid.UUID(req.leader_id)
+        leader_id = req.leader_id
+    except ValueError:
+        first_leader = db_execute("SELECT id FROM leaders LIMIT 1", fetchone=True)
+        if first_leader:
+            leader_id = str(first_leader["id"])
+        else:
+            raise HTTPException(status_code=400, detail="Invalid leader session")
 
-    # 1. Fetch receivers
-    receivers_list = db_execute(
-        "SELECT id, receiver_phone, receiver_email, language, has_whatsapp, is_app_user, app_user_id FROM leader_receivers WHERE leader_id = %s",
-        (req.leader_id,),
-        fetchall=True
-    )
-    
-    if not receivers_list:
-        raise HTTPException(status_code=400, detail="You have no receivers in your list.")
+    try:
+        # 1. Fetch receivers
+        receivers_list = db_execute(
+            "SELECT id, receiver_phone, receiver_email, language, has_whatsapp, is_app_user, app_user_id FROM leader_receivers WHERE leader_id = %s",
+            (leader_id,),
+            fetchall=True
+        )
+        
+        if not receivers_list:
+            raise HTTPException(status_code=400, detail="You have no receivers in your list.")
+    except Exception as base_e:
+        import traceback
+        with open("crash_log.txt", "w") as f: f.write(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(base_e))
 
     # 2. Log parent message
     msg_res = db_execute(
         """INSERT INTO messages (sender_id, message_text, original_language, total_receivers) 
            VALUES (%s, %s, %s, %s) RETURNING id""",
-        (req.leader_id, req.message, req.language, len(receivers_list)),
+        (leader_id, req.message, req.language, len(receivers_list)),
         commit=True,
         fetchone=True
     )
@@ -286,7 +383,16 @@ async def send_message(req: BroadcastRequest):
             
             trans_text = req.translated_text
             r_lang = r.get("language") or req.language
+            r_lang = r_lang.strip().lower()
+            if r_lang == "hindi": r_lang = "hi"
+            if r_lang == "marathi": r_lang = "mr"
+            if r_lang == "english": r_lang = "en"
+            
             audio_url = None
+            
+            # Map avatar to gender for fallback TTS
+            avatar_name = getattr(req, "avatar", "arjun").lower()
+            gender = "female" if avatar_name in ["priya", "asha"] else "male"
             
             # Cache translation and TTS per language
             if not hasattr(send_message, "lang_cache"):
@@ -297,31 +403,68 @@ async def send_message(req: BroadcastRequest):
             cache = send_message.lang_cache[str(message_id)]
             
             if r_lang not in cache:
-                if r_lang == req.language:
+                if r_lang == req.language or r_lang == req.language.lower():
                     tgt_text = req.translated_text
                 else:
-                    tgt_text = translate_text(req.message, r_lang)
+                    tgt_text = translate_text(req.message, source_lang=req.language, target_lang=r_lang)
                 
                 tgt_audio_url = None
-                try:
-                    os.makedirs(os.path.join("..", "output", "audio"), exist_ok=True)
-                    audio_path = os.path.join("..", "output", "audio", f"msg_{message_id}_{r_lang}.mp3")
-                    generate_speech(tgt_text, r_lang, audio_path)
-                    res = cloudinary.uploader.upload(audio_path, resource_type="video")
-                    tgt_audio_url = res.get("secure_url")
-                except Exception as e:
-                    print(f"TTS/Cloudinary Error for {r_lang}: {e}")
+                tgt_video_url = None
+                
+                # Check for pre-generated video first
+                has_video = False
+                for v in req.video_metadata:
+                    if v.get("language_code") == r_lang:
+                        tgt_video_url = v.get("video_url")
+                        tgt_audio_url = v.get("audio_url") or tgt_video_url  # video has audio
+                        tgt_text = v.get("translated_text") or tgt_text
+                        has_video = True
+                        break
+                
+                if not has_video:
+                    try:
+                        filename = f"msg_{message_id}_{r_lang}.mp3"
+                        audio_path = os.path.join(AUDIO_DIR, filename)
+                        generate_speech(tgt_text, r_lang, audio_path, gender=gender)
+                        # Try Cloudinary first
+                        try:
+                            res = cloudinary.uploader.upload(audio_path, resource_type="video")
+                            tgt_audio_url = res.get("secure_url")
+                            print(f"[AUDIO] Cloudinary upload OK: {tgt_audio_url}")
+                        except Exception as cloud_err:
+                            print(f"[AUDIO] Cloudinary failed ({cloud_err}), trying catbox.moe...")
+                            # Fallback: upload to catbox.moe
+                            import requests as _req
+                            with open(audio_path, "rb") as f:
+                                r = _req.post(
+                                    "https://catbox.moe/user/api.php",
+                                    data={"reqtype": "fileupload"},
+                                    files={"fileToUpload": (filename, f, "audio/mpeg")},
+                                    timeout=20
+                                )
+                            if r.ok and r.text.startswith("https://"):
+                                tgt_audio_url = r.text.strip()
+                                print(f"[AUDIO] Catbox upload OK: {tgt_audio_url}")
+                    except Exception as e:
+                        print(f"TTS Error for {r_lang}: {e}")
                     
-                cache[r_lang] = {"text": tgt_text, "audio_url": tgt_audio_url}
+                cache[r_lang] = {"text": tgt_text, "audio_url": tgt_audio_url, "video_url": tgt_video_url}
                 db_execute(
-                    "INSERT INTO message_translations (message_id, language, translated_text, audio_url) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING",
-                    (message_id, r_lang, tgt_text, tgt_audio_url),
+                    "INSERT INTO message_translations (message_id, language, translated_text, audio_url, video_url) VALUES (%s, %s, %s, %s, %s) ON CONFLICT DO NOTHING",
+                    (message_id, r_lang, tgt_text, tgt_audio_url, tgt_video_url),
                     commit=True
                 )
                 
             trans_text = cache[r_lang]["text"]
             audio_url = cache[r_lang]["audio_url"]
+            video_url = cache[r_lang]["video_url"]
             
+            # Prepare message content with media link for SMS/WhatsApp
+            full_message = trans_text
+            if video_url:
+                full_message += f"\n\nWatch Video Announcement: {video_url}"
+            elif audio_url:
+                full_message += f"\n\nListen to Audio: {audio_url}"
             # Inbox for App Users
             if r.get("is_app_user") and r.get("app_user_id"):
                 db_execute(
@@ -348,8 +491,9 @@ async def send_message(req: BroadcastRequest):
 
             # WhatsApp
             if r.get("has_whatsapp") and r.get("receiver_phone"):
-                wa_text = f"Official Announcement:\n{trans_text}"
-                ok, msg = notifications.send_whatsapp(r["receiver_phone"], wa_text, media_url=audio_url)
+                wa_text = f"Official Announcement:\n{full_message}"
+                wa_media = video_url if video_url else (audio_url if audio_url and audio_url.startswith("http") else None)
+                ok, msg = notifications.send_whatsapp(r["receiver_phone"], wa_text, media_url=wa_media)
                 if ok:
                     p_wa = "sent"
                     receiver_success = True
@@ -359,7 +503,7 @@ async def send_message(req: BroadcastRequest):
 
             # SMS
             if r.get("receiver_phone"):
-                sms_text = f"Announcement: {trans_text}"
+                sms_text = f"Announcement: {full_message}"
                 ok, msg = notifications.send_sms(r["receiver_phone"], sms_text)
                 if ok:
                     p_sms = "sent"
@@ -373,14 +517,19 @@ async def send_message(req: BroadcastRequest):
             else:
                 failed += 1
 
+            recipient_id = str(uuid.uuid4())
             db_execute(
-                """INSERT INTO message_recipients (message_id, receiver_id, translated_text, email_status, whatsapp_status, sms_status, error_reason)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (message_id, r["id"], trans_text, p_email, p_wa, p_sms, "; ".join(err_reason)),
+                """INSERT INTO message_recipients (id, message_id, receiver_id, translated_text, email_status, whatsapp_status, sms_status, error_reason)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (recipient_id, message_id, r["id"], trans_text, p_email, p_wa, p_sms, "; ".join(err_reason)),
                 commit=True
             )
         except Exception as dispatch_err:
-            print(f"⚠️ Dispatch error for receiver {r.get('id')}: {dispatch_err}")
+            import traceback
+            with open("crash_log.txt", "a") as f:
+                f.write(f"CRASH on receiver {r.get('id')}:\n")
+                f.write(traceback.format_exc())
+            print(f"Warning: Dispatch error for receiver {r.get('id')}: {dispatch_err}")
             failed += 1
 
     db_execute(
@@ -492,6 +641,53 @@ async def get_analytics():
         "messages_delivered": len(messages_db),
         "engagement_rate": 87.5,
     }
+
+@app.get("/announcements")
+async def get_announcements(state: str):
+    """
+    Fetch regional announcements specific to the user's state.
+    """
+    try:
+        # 1. Look up the leader(s) assigned to this state
+        leaders = db_execute(
+            "SELECT id, name FROM leaders WHERE state = %s", 
+            (state,), 
+            fetchall=True
+        )
+        
+        if not leaders:
+            return []
+            
+        leader = leaders[0]
+        leader_id = leader["id"]
+        
+        # 2. Query messages broadcasted by this leader
+        try:
+            messages = db_execute(
+                "SELECT id, message_text, created_at FROM messages WHERE sender_id = %s ORDER BY created_at DESC",
+                (leader_id,),
+                fetchall=True
+            )
+        except Exception:
+            messages = []
+            
+        # 3. Format payload for the Flutter frontend
+        results = []
+        if messages:
+            for m in messages:
+                results.append({
+                    "_id": str(m["id"]),
+                    "title": f"Update from {leader['name']}",
+                    "message": m["message_text"],
+                    "category": "General",
+                    "is_urgent": False,
+                    "constituency_id": state,
+                    "created_at": m["created_at"].isoformat() if hasattr(m["created_at"], "isoformat") else str(m["created_at"])
+                })
+        return results
+    except Exception as e:
+        print(f"Error fetching announcements: {e}")
+        return []
 
 
 # ==================== Consent Lock ====================

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRATINIDHI Clean Logo Transition</title>
+  <style>
+    :root {
+      --bg-color: #0A1628; /* Midnight Blue */
+      --white: #FFFFFF;
+      --saffron: #FF9933;
+      --green: #138808;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      /* Add a subtle radial glow behind the logo */
+      background: radial-gradient(circle at center, rgba(30, 60, 100, 0.4) 0%, #0A1628 60%);
+    }
+
+    .splash-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+    }
+
+    /* SVG Canvas */
+    .logo-svg {
+      width: 160px;
+      height: 200px;
+      overflow: visible;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
+    }
+
+    /* The new detached 3D 'P' design */
+    .p-stem {
+      fill: none;
+      stroke: var(--white);
+      stroke-width: 32;
+      stroke-linecap: round;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: drawStem 0.8s cubic-bezier(0.8, 0, 0.2, 1) forwards,
+                 fillStem 0.5s ease-out 0.8s forwards;
+    }
+
+    .p-curve {
+      fill: none;
+      stroke: var(--white);
+      stroke-width: 32;
+      stroke-linecap: round;
+      stroke-linejoin: miter;
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+      animation: drawCurve 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s forwards,
+                 fillCurve 0.5s ease-out 1.2s forwards;
+    }
+
+    /* Glow effect that pulses gently after drawing */
+    .glow-layer {
+      animation: pulseGlow 3s ease-in-out 2s infinite alternate;
+    }
+
+    @keyframes drawStem {
+      to { stroke-dashoffset: 0; }
+    }
+    
+    @keyframes fillStem {
+      to { fill: url(#metallicGradient); stroke-width: 0; }
+    }
+
+    @keyframes drawCurve {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes fillCurve {
+      to { fill: url(#metallicGradient); stroke-width: 0; }
+    }
+
+    @keyframes pulseGlow {
+      from { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3)); transform: translateY(0); }
+      to   { filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.6)); transform: translateY(-4px); }
+    }
+
+    /* Text Reveal Container */
+    .text-container {
+      position: relative;
+      text-align: center;
+    }
+
+    .brand-text {
+      color: var(--white);
+      font-size: 28px;
+      letter-spacing: 16px;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(20px);
+      /* Snapping motion */
+      animation: snapText 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.6s forwards;
+      /* Add slight tricolor gradient to text just for spice */
+      background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-indent: 16px; /* Offset the letter spacing centering */
+    }
+
+    .brand-text.tricolor {
+      animation: snapText 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.6s forwards,
+                 gradientText 4s linear 2.5s infinite;
+    }
+
+    .sub-text {
+      color: #94A3B8;
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      opacity: 0;
+      margin-top: 12px;
+      transform: translateY(10px);
+      animation: fadeUp 0.8s ease-out 1.8s forwards;
+    }
+
+    @keyframes snapText {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes gradientText {
+      0% { background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      20% { background: linear-gradient(90deg, var(--saffron), #FFFFFF, var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      80% { background: linear-gradient(90deg, var(--saffron), #FFFFFF, var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      100% { background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    }
+
+    .restart-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+    .restart-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <button class="restart-btn" onclick="location.reload()">Replay Transition</button>
+
+  <div class="splash-container">
+    
+    <!-- Clean, detached 'P' SVG mimicking the new image -->
+    <svg class="logo-svg glow-layer" viewBox="0 0 160 200">
+      <defs>
+        <!-- Metallic/3D gradient to give that premium look -->
+        <linearGradient id="metallicGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFFFFF"/>
+          <stop offset="40%" stop-color="#E2E8F0"/>
+          <stop offset="60%" stop-color="#CBD5E1"/>
+          <stop offset="100%" stop-color="#94A3B8"/>
+        </linearGradient>
+      </defs>
+
+      <!-- The detached sweeping top curve (draws right to left, over the top) -->
+      <!-- Start from the inner right, swoop up/left, end sharp left -->
+      <!-- Modified to be thick paths filling to pure shape -->
+      <path class="p-curve" d="M 120,60 
+                                C 120,-10 10,-20 30,50
+                                C 20,40 20,10 70,10
+                                C 130,10 160,80 80,110 Z" />
+
+      <!-- The thick central stem (detached) -->
+      <!-- A vertical pill box starting slightly below the curve -->
+      <path class="p-stem" d="M 60,30 L 60,170 C 60,185 80,185 80,170 L 80,30 C 80,15 60,15 60,30 Z" />
+    </svg>
+
+    <!-- Clean PRATINIDHI text reveal without any orbiting clutter -->
+    <div class="text-container">
+      <div class="brand-text tricolor">PRATINIDHI</div>
+      <div class="sub-text">AI Governance Platform</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

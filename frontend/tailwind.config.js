@@ -7,17 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
+        cream: {
+          50: '#FDFBF7',
+          100: '#F9F8F3',
+          200: '#F0EBE1',
+          300: '#E6DCC8',
+        },
         primary: {
-          50: '#e6edf7',
-          100: '#b3c8e6',
-          200: '#80a3d5',
-          300: '#4d7ec4',
-          400: '#1a59b3',
-          500: '#0B3D91',
-          600: '#093174',
-          700: '#072557',
-          800: '#05193a',
-          900: '#020c1d',
+          50: '#e6eef4',
+          100: '#b3cfe0',
+          200: '#80b0cc',
+          300: '#4d91b8',
+          400: '#1a72a4',
+          500: '#0A3D62',
+          600: '#08314e',
+          700: '#06253b',
+          800: '#041927',
+          900: '#020c14',
         },
         saffron: {
           50: '#fff5e6',
@@ -31,10 +37,24 @@ export default {
           800: '#663d14',
           900: '#331f0a',
         },
+        indian: {
+          green: '#138808',
+          'green-light': '#1fa510',
+          'green-50': '#e8f5e6',
+          'green-100': '#c8e6c0',
+        },
       },
       fontFamily: {
         heading: ['Poppins', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'float-reverse': 'floatReverse 7s ease-in-out infinite',
+        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+        'slide-up': 'slideUp 0.7s ease-out forwards',
+        'gradient-shift': 'gradient-shift 4s ease infinite',
+        'marquee': 'marquee 30s linear infinite',
       },
     },
   },

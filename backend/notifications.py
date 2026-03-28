@@ -33,12 +33,17 @@ def send_whatsapp(to_phone: str, message: str, media_url: str = None) -> (bool, 
         elif not to_phone.startswith("+"):
             to_phone = "+" + clean_phone
             
+        if not TWILIO_WHATSAPP_NUMBER.startswith("whatsapp:"):
+            from_number = f"whatsapp:{TWILIO_WHATSAPP_NUMBER}"
+        else:
+            from_number = TWILIO_WHATSAPP_NUMBER
+            
         kwargs = {
-            "from_": TWILIO_WHATSAPP_NUMBER,
+            "from_": from_number,
             "body": message,
             "to": f"whatsapp:{to_phone}"
         }
-        if media_url:
+        if media_url and "localhost" not in media_url and "127.0.0.1" not in media_url:
             kwargs["media_url"] = [media_url]
             
         msg = client.messages.create(**kwargs)

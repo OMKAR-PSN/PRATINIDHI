@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Globe, ChevronDown, Shield } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import LanguageSelector from './LanguageSelector'
 
 export default function Navbar({ transparent = false, showSearch = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -16,9 +17,9 @@ export default function Navbar({ transparent = false, showSearch = false }) {
 
   const navBg = transparent
     ? scrolled
-      ? 'bg-white/90 backdrop-blur-xl shadow-sm shadow-black/5'
+      ? 'bg-cream-50/90 backdrop-blur-xl shadow-sm shadow-black/5'
       : 'bg-transparent'
-    : 'bg-white/90 backdrop-blur-xl shadow-sm shadow-black/5'
+    : 'bg-cream-50/90 backdrop-blur-xl shadow-sm shadow-black/5'
 
   const textClass = transparent && !scrolled ? 'text-white' : 'text-gray-700'
   const logoText = transparent && !scrolled ? 'text-white' : 'text-gray-900'
@@ -34,11 +35,8 @@ export default function Navbar({ transparent = false, showSearch = false }) {
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center relative w-10 h-10 min-w-[40px] group-hover:scale-105 transition-transform duration-300">
-              <div className="absolute inset-0 rounded-full border-[3px] border-t-saffron-500 border-r-white border-b-indian-green border-l-primary-600 shadow-md"></div>
-              <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-inner">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
+            <div className="flex items-center justify-center w-12 h-12 min-w-[48px] group-hover:scale-105 transition-transform duration-300 rounded-xl overflow-hidden shadow-sm">
+              <img src="/logo_web.jpg" alt="Pratinidhi Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col">
               <span className={`font-heading font-extrabold text-xl tracking-tight leading-none ${logoText} transition-colors duration-300`}>
@@ -74,8 +72,9 @@ export default function Navbar({ transparent = false, showSearch = false }) {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSelector />
             <Link
-              to="/login"
+              to="/signup"
               className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:bg-black/5 ${textClass}`}
             >
               Sign In
@@ -100,7 +99,7 @@ export default function Navbar({ transparent = false, showSearch = false }) {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 animate-fade-in-up shadow-xl">
+        <div className="md:hidden bg-cream-50/95 backdrop-blur-xl border-t border-cream-100 animate-fade-in-up shadow-xl">
           <div className="px-4 py-6 space-y-2">
             {isLanding && (
               <>
@@ -117,7 +116,7 @@ export default function Navbar({ transparent = false, showSearch = false }) {
               </>
             )}
             <div className="pt-3 border-t border-gray-100 space-y-2">
-              <Link to="/login" className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-xl transition-all">
+              <Link to="/signup" className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-xl transition-all">
                 Sign In
               </Link>
               <Link

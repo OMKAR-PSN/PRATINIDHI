@@ -4,10 +4,11 @@ import AvatarPlayer from '../components/AvatarPlayer'
 import { getAvatar, sendMessage, getPreviewTranslation } from '../services/api'
 import {
   Download, Share2, Send, Globe, Clock, FileText, Copy, Check,
-  Loader2, CheckCircle2, XCircle, Smartphone
+  Loader2, CheckCircle2, XCircle, Smartphone, Eye
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 const qualityOptions = [
   { id: '240p', label: '240p', desc: 'Low bandwidth / WhatsApp', size: '~2 MB' },
@@ -24,31 +25,32 @@ export default function AvatarPreview() {
   const [avatar, setAvatar] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isPublishing, setIsPublishing] = useState(false)
-  const [publishStatus, setPublishStatus] = useState(null) // { success: bool, message: str }
+  const [publishStatus, setPublishStatus] = useState(null)
 
-  // Preview Translation State
+  // Real Generated Videos State
+  const [generatedVideos, setGeneratedVideos] = useState([])
+  const [activeVideo, setActiveVideo] = useState(null)
+
+  // Preview Translation State (only for non-generated / old demo flow)
   const [selectedLanguage, setSelectedLanguage] = useState(null)
   const [previewAudioUrl, setPreviewAudioUrl] = useState(null)
   const [previewTranslatedText, setPreviewTranslatedText] = useState(null)
   const [isTranslating, setIsTranslating] = useState(false)
 
-  // Consent state (Default to approved as per user request to bypass gate)
-  const [consentStep, setConsentStep] = useState('approved') // approved
-  const [otp, setOtp] = useState('')
-
   const leaderId = localStorage.getItem('leaderId') || 'admin'
 
-  // Fetch preview translation
+  // Fetch translation logic for demo flow
   useEffect(() => {
     const fetchTranslation = async () => {
       if (!avatar || !selectedLanguage) return;
-      if (avatar.id !== 'generated') return;
+      if (id === 'generated') return; // Do not fetch translation if we have generated videos
       
       setIsTranslating(true)
       try {
         const { data } = await getPreviewTranslation({
           text: avatar.original_text,
-          language: selectedLanguage
+          language: selectedLanguage,
+          avatar: localStorage.getItem('generatedAvatar') || 'arjun'
         })
         setPreviewTranslatedText(data.translated_text)
         setPreviewAudioUrl(data.audio_url)
@@ -59,27 +61,52 @@ export default function AvatarPreview() {
       }
     }
     fetchTranslation()
-  }, [avatar?.original_text, selectedLanguage, avatar?.id])
+  }, [avatar?.original_text, selectedLanguage, id])
 
   useEffect(() => {
     const fetchAvatar = async () => {
-      // Real generated content — read the leader's actual message
+      // Real generated content — read the leader's actual message from localStorage
       if (id === 'generated') {
         const userMessage = localStorage.getItem('generatedMessage') || ''
-        const lang = localStorage.getItem('generatedLanguage') || 'hi'
-        const langLabel = localStorage.getItem('generatedLanguageLabel') || 'Hindi'
-
-        setAvatar({
-          id: 'generated',
-          original_text: userMessage,
-          translated_text: userMessage, // In production, this would be the BHASHINI translation
-          language: langLabel,
-          languageCode: lang,
-          video_url: null,
-          created_at: new Date().toLocaleString(),
-          consent_status: 'approved'
+        const videosStr = localStorage.getItem('generatedAvatarVideos')
+        const rawVideos = videosStr ? JSON.parse(videosStr) : []
+        
+        // Deduplicate language options just in case backend aggregated duplicates
+        const seen = new Set()
+        const videos = rawVideos.filter(v => {
+          if (seen.has(v.language_code)) return false
+          seen.add(v.language_code)
+          return true
         })
-        setSelectedLanguage(lang)
+
+        setGeneratedVideos(videos)
+
+        if (videos.length > 0) {
+          const firstVid = videos[0]
+          setActiveVideo(firstVid)
+          setSelectedLanguage(firstVid.language_code)
+          setAvatar({
+            id: 'generated',
+            original_text: userMessage,
+            translated_text: firstVid.translated_text || userMessage, 
+            language: firstVid.language,
+            languageCode: firstVid.language_code,
+            video_url: firstVid.video_url,
+            created_at: new Date().toLocaleString(),
+          })
+        } else {
+          // Fallback if no videos are found
+          setAvatar({
+            id: 'generated',
+            original_text: userMessage,
+            translated_text: userMessage,
+            language: 'Hindi',
+            languageCode: 'hi',
+            video_url: null,
+            created_at: new Date().toLocaleString()
+          })
+          setSelectedLanguage('hi')
+        }
         setLoading(false)
         return
       }
@@ -112,14 +139,33 @@ export default function AvatarPreview() {
     fetchAvatar()
   }, [id])
 
-  const shareUrl = `${window.location.origin}/view/${avatar?.id || id}`
+  // Handle changing language in the UI
+  const handleLanguageChange = (langCode) => {
+    setSelectedLanguage(langCode)
+    
+    // For Generated Videos flow: swap out the active playing video
+    if (id === 'generated' && generatedVideos.length > 0) {
+      const vid = generatedVideos.find(v => v.language_code === langCode)
+      if (vid) {
+        setActiveVideo(vid)
+        setAvatar(prev => ({
+          ...prev,
+          language: vid.language,
+          languageCode: vid.language_code,
+          video_url: vid.video_url,
+          translated_text: vid.translated_text || prev.original_text
+        }))
+      }
+    }
+  }
+
+  const shareUrl = `${window.location.origin}/view/${activeVideo?.video_id || avatar?.id || id}`
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
-
 
   const handleWhatsAppShare = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(`Watch this government announcement: ${shareUrl}`)}`, '_blank')
@@ -133,7 +179,10 @@ export default function AvatarPreview() {
         leader_id: leaderId,
         message: avatar?.original_text || '',
         translated_text: avatar?.translated_text || '',
-        language: avatar?.languageCode || 'hi'
+        language: avatar?.languageCode || 'hi',
+        avatar: localStorage.getItem('generatedAvatar') || activeVideo?.avatar || 'arjun',
+        video_metadata: generatedVideos
+        // the backend handles dispatching to all receivers based on their preferences
       })
       setPublishStatus({ 
         success: true, 
@@ -168,7 +217,7 @@ export default function AvatarPreview() {
             <h1 className="font-heading text-2xl font-bold text-gray-900 tracking-tight">{t('preview_title', 'Avatar Preview')}</h1>
             <p className="text-gray-500 text-sm mt-1">{t('preview_sub', 'Review, approve, and share your generated avatar')}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button className="px-4 py-2.5 rounded-xl glass-card text-gray-700 font-medium text-sm flex items-center gap-2 hover:bg-white/80 transition-all btn-press">
               <Download className="w-4 h-4" /> {t('preview_dl', 'Download')}
             </button>
@@ -196,31 +245,25 @@ export default function AvatarPreview() {
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Video Player */}
           <div className="lg:col-span-3 space-y-4">
-            <AvatarPlayer videoUrl={avatar?.video_url} title={avatar?.original_text} />
-
-            {/* Audio Preview */}
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-semibold text-gray-700">{t('preview_audio', 'Audio Preview')}</span>
+            
+            {/* The single unified Video Player */}
+            {avatar?.video_url ? (
+              <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm relative">
+                <div className="absolute top-3 left-3 bg-black/50 text-white px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md z-10 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  {avatar?.language} Version
                 </div>
-                <span className="text-[11px] font-medium text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full">
-                  {t('preview_audio_feature', 'Translated Feature')}
-                </span>
+                <video
+                  key={avatar?.video_url} // Forces remount on URL change!
+                  src={avatar?.video_url}
+                  controls
+                  autoPlay
+                  className="w-full max-h-[500px] bg-black object-contain"
+                />
               </div>
-              <p className="text-xs text-gray-500 mb-3">{t('preview_audio_desc', 'Listen to the translated speech. Each receiver gets custom audio in their language via WhatsApp.')}</p>
-              {(avatar?.id === 'generated' ? previewAudioUrl : avatar?.audioUrl) && !isTranslating ? (
-                <audio controls className="w-full h-10" key={avatar?.id === 'generated' ? previewAudioUrl : avatar?.audioUrl}>
-                  <source src={`http://localhost:8000${avatar?.id === 'generated' ? previewAudioUrl : avatar?.audioUrl}`} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              ) : (
-                <div className="text-sm font-medium text-gray-500 italic p-3 bg-gray-50 rounded-xl border border-gray-100/50">
-                  <Loader2 className="w-4 h-4 animate-spin inline mr-2 text-blue-400" /> Generating translated audio...
-                </div>
-              )}
-            </div>
+            ) : (
+              <AvatarPlayer videoUrl={null} title={avatar?.original_text} />
+            )}
 
             {/* Quality selector */}
             <div className="glass-card rounded-2xl p-4">
@@ -268,44 +311,54 @@ export default function AvatarPreview() {
           {/* Right panel */}
           <div className="lg:col-span-2 space-y-4">
 
+            {/* Language Selection */}
+            <div className="glass-card rounded-2xl p-5 border-l-4 border-blue-500">
+              <h3 className="font-heading font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-500" />
+                Select Language Version
+              </h3>
+              
+              {id === 'generated' && generatedVideos.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {generatedVideos.map(vid => (
+                    <button
+                      key={vid.language_code}
+                      onClick={() => handleLanguageChange(vid.language_code)}
+                      className={`flex flex-col items-start p-3 rounded-xl border text-left transition-all btn-press ${
+                        selectedLanguage === vid.language_code 
+                          ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="font-bold text-gray-900 text-sm">{vid.language}</span>
+                      <span className="text-[10px] text-gray-500 font-medium mt-0.5">{vid.receivers_count} receivers</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <select
+                  value={selectedLanguage || avatar?.languageCode || 'hi'}
+                  onChange={(e) => handleLanguageChange(e.target.value)}
+                  className="mt-1.5 text-sm p-3 rounded-xl border border-gray-200 outline-none w-full bg-white/50 focus:bg-white transition-all font-medium text-gray-800"
+                  disabled={isTranslating}
+                >
+                  <option value="hi">Hindi</option>
+                  <option value="mr">Marathi</option>
+                  <option value="ta">Tamil</option>
+                  <option value="te">Telugu</option>
+                  <option value="kn">Kannada</option>
+                  <option value="ml">Malayalam</option>
+                  <option value="bn">Bengali</option>
+                  <option value="gu">Gujarati</option>
+                  <option value="en">English</option>
+                </select>
+              )}
+            </div>
+
             {/* Details */}
             <div className="glass-card rounded-2xl p-5">
               <h3 className="font-heading font-semibold text-gray-900 mb-4">{t('preview_details', 'Details')}</h3>
               <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <Globe className="w-4 h-4 text-blue-400 mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-xs text-gray-400 flex justify-between">
-                      {t('preview_lang', 'Preview Language')}
-                      {isTranslating && <Loader2 className="w-3 h-3 animate-spin inline" />}
-                    </p>
-                    
-                    {avatar?.id === 'generated' ? (
-                      <select
-                        value={selectedLanguage || avatar?.languageCode || 'hi'}
-                        onChange={(e) => setSelectedLanguage(e.target.value)}
-                        className="mt-1.5 text-sm p-2 rounded-lg border border-gray-200 outline-none w-full bg-white/50 focus:bg-white transition-all font-medium text-gray-800"
-                        disabled={isTranslating}
-                      >
-                        <option value="hi">Hindi</option>
-                        <option value="mr">Marathi</option>
-                        <option value="ta">Tamil</option>
-                        <option value="te">Telugu</option>
-                        <option value="kn">Kannada</option>
-                        <option value="ml">Malayalam</option>
-                        <option value="bn">Bengali</option>
-                        <option value="gu">Gujarati</option>
-                        <option value="or">Odia</option>
-                        <option value="en">English</option>
-                      </select>
-                    ) : (
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-sm font-medium text-gray-800">{avatar?.language || 'Hindi'}</p>
-                        <span className="badge-lang text-[10px] font-bold px-2 py-0.5 rounded-full">{(avatar?.languageCode || 'hi').toUpperCase()}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-blue-400 mt-0.5" />
                   <div>
@@ -313,25 +366,39 @@ export default function AvatarPreview() {
                     <p className="text-sm font-medium text-gray-800">{avatar?.created_at}</p>
                   </div>
                 </div>
+                {activeVideo && (
+                  <div className="flex items-start gap-3 mt-3">
+                    <Globe className="w-4 h-4 text-blue-400 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-gray-400">Model Configuration</p>
+                      <p className="text-sm font-medium text-gray-800 capitalize">{activeVideo.avatar} (Wav2Lip GAN)</p>
+                      <p className="text-[10px] text-gray-500">{activeVideo.voice_used}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Transcripts */}
+            {/* Input Transcript */}
             <div className="glass-card rounded-2xl p-5">
               <h3 className="font-heading font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-gray-400" /> {t('preview_orig', 'Original')}
+                <FileText className="w-4 h-4 text-gray-400" /> Input Message Transcript
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed bg-gray-50/50 rounded-xl p-3.5 border border-gray-100/50">{avatar?.original_text}</p>
+              <p className="text-sm text-gray-600 leading-relaxed bg-gray-50/50 rounded-xl p-3.5 border border-gray-100/50">
+                {avatar?.original_text}
+              </p>
             </div>
 
+            {/* Translated Text — shown for ALL flows */}
             <div className="glass-card rounded-2xl p-5">
               <h3 className="font-heading font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-saffron-400" /> {t('preview_trans', 'Translated Text')}
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-saffron-50/30 to-orange-50/20 rounded-xl p-3.5 border border-saffron-100/50">
-                {isTranslating ? 'Translating...' : (avatar?.id === 'generated' ? previewTranslatedText : avatar?.translated_text)}
+                {isTranslating ? 'Translating...' : avatar?.translated_text || previewTranslatedText || ''}
               </p>
             </div>
+            
           </div>
         </div>
       </div>

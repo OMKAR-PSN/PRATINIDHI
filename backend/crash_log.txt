@@ -1,0 +1,70 @@
+CRASH on receiver a129eb14-6e6c-4f7a-84e6-b842405a5827:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 431, in send_message
+    ok, msg = notifications.send_email(r["receiver_email"], "Official Announcement", email_body)
+              ^^^^^^^^^^^^^
+NameError: name 'notifications' is not defined
+CRASH on receiver 565c3ac9-f8ac-47b2-a34f-17a020418327:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 431, in send_message
+    ok, msg = notifications.send_email(r["receiver_email"], "Official Announcement", email_body)
+              ^^^^^^^^^^^^^
+NameError: name 'notifications' is not defined
+CRASH on receiver 116e11ab-ee93-43d2-ace2-9b0d4edc295a:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 431, in send_message
+    ok, msg = notifications.send_email(r["receiver_email"], "Official Announcement", email_body)
+              ^^^^^^^^^^^^^
+NameError: name 'notifications' is not defined
+CRASH on receiver 147d7fbe-c00a-461d-878a-4ec6b8f5f61a:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 431, in send_message
+    ok, msg = notifications.send_email(r["receiver_email"], "Official Announcement", email_body)
+              ^^^^^^^^^^^^^
+NameError: name 'notifications' is not defined
+CRASH on receiver a129eb14-6e6c-4f7a-84e6-b842405a5827:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\database.py", line 75, in db_execute
+    cur.execute(query, params)
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 403, in send_message
+    db_execute(
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\database.py", line 88, in db_execute
+    conn.rollback()
+psycopg2.InterfaceError: connection already closed
+CRASH on receiver a129eb14-6e6c-4f7a-84e6-b842405a5827:
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\database.py", line 75, in db_execute
+    cur.execute(query, params)
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\main.py", line 403, in send_message
+    db_execute(
+  File "C:\Users\aryan\Documents\Hackathon\Pratinidhi_Ai\backend\database.py", line 88, in db_execute
+    conn.rollback()
+psycopg2.InterfaceError: connection already closed

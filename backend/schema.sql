@@ -32,6 +32,17 @@ CREATE TABLE avatar_signatures (
     is_revoked BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE IF NOT EXISTS message_translations (
+    id SERIAL PRIMARY KEY,
+    message_id INTEGER REFERENCES messages(id) ON DELETE CASCADE,
+    language TEXT NOT NULL,
+    translated_text TEXT,
+    audio_url TEXT,
+    video_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(message_id, language)
+);
+
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     leader_id UUID REFERENCES leaders(id) ON DELETE CASCADE,

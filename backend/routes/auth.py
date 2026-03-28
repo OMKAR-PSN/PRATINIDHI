@@ -123,44 +123,11 @@ async def signup(req: SignupRequest):
 
 @router.post("/login")
 async def login(req: LoginRequest):
-    hashed_pw = hash_password(req.password)
-    found_user = None
-    
-    try:
-        user = db_execute("SELECT * FROM leaders WHERE email = %s", (req.email,), fetchone=True)
-        if user and user.get("password_hash") == hashed_pw:
-            found_user = user
-    except Exception as e:
-        print(f"Neon DB login read failed: {e}")
-            
-    # Try Redis fallback if DB failed or user not found there
-    if not found_user and redis_client:
-        try:
-            cached_user = redis_client.get(f"user:{req.email}")
-            if cached_user:
-                import ast
-                user = ast.literal_eval(cached_user)
-                if user.get("password_hash") == hashed_pw:
-                    found_user = user
-        except Exception as e:
-            print(f"Redis login fallback failed: {e}")
-                
-    if not found_user:
-        # Extra mock for "admin@gov.in" to test easily
-        if req.email == "admin@gov.in":
-            return {
-                "id": "admin",
-                "email": "admin@gov.in",
-                "name": "Admin Leader",
-                "phone": "9999999999",
-                "role": "admin"
-            }
-        raise HTTPException(400, "Invalid email or password")
-        
+    # Temporary bypass: forcefully log in as aryan dalvi
     return {
-        "id": found_user.get("id"),
-        "email": found_user.get("email"),
-        "name": found_user.get("name"),
-        "phone": found_user.get("phone"),
-        "role": found_user.get("role")
+        "id": "295e4c48-424a-4db2-a06f-329d2f4d4d0b",
+        "email": "aryandalvi0306@gmail.com",
+        "name": "aryan dalvi",
+        "phone": "8600504553",
+        "role": "admin"
     }

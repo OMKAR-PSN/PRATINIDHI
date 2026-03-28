@@ -13,7 +13,8 @@ export default function MessagePreview() {
   useEffect(() => {
     const fetchPreview = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/messages/${id}/preview?leader_id=${leaderId}`)
+        const apiBase = import.meta.env.VITE_API_URL || ''
+        const res = await fetch(`${apiBase}/api/messages/${id}/preview?leader_id=${leaderId}`)
         if (!res.ok) throw new Error("Failed to fetch")
         const json = await res.json()
         setData(json)
